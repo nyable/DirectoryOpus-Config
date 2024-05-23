@@ -56,7 +56,7 @@ function OnSmartExtract (cmdData) {
       var fileParentPath = target.path
       var extractDir = fileParentPath + '/' + fileNameStem
       DOpus.Output('开始解压文件:' + fullPath + '=>' + extractDir)
-      var result = cmd.RunCommand("COPY " + fullPath + " EXTRACT=sub HERE")
+      var result = cmd.RunCommand("COPY " + wrapPath(fullPath) + " EXTRACT=sub HERE")
       if (result) {
         DOpus.Output('解压完毕:' + fullPath)
         var folderEnum = DOpus.FSUtil.ReadDir(extractDir)
@@ -68,7 +68,7 @@ function OnSmartExtract (cmdData) {
             var firstFile = files[0]
             if (firstFile.is_dir && firstFile.name == fileNameStem) {
               var firstRealPath = firstFile.RealPath
-              cmd.RunCommand('COPY MOVE ' + firstRealPath + ' TO ' + fileParentPath)
+              cmd.RunCommand('COPY MOVE ' + wrapPath(firstRealPath) + ' TO ' + wrapPath(fileParentPath))
               DOpus.Output("将目录" + firstRealPath + '移动至' + fileParentPath)
             }
           }
@@ -83,4 +83,11 @@ function OnSmartExtract (cmdData) {
 
   }
 
+}
+
+function wrapPath (path) {
+  if (path) {
+    return '"' + path + '"'
+  }
+  return '""'
 }
