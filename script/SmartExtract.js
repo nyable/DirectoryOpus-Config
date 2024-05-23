@@ -1,4 +1,4 @@
-// SmartExtract
+﻿// SmartExtract
 // (c) 2024 nyable
 
 // This is a script for Directory Opus.
@@ -69,7 +69,7 @@ function OnSmartExtract (cmdData) {
             if (firstFile.is_dir && firstFile.name == fileNameStem) {
               var firstRealPath = firstFile.RealPath
               cmd.RunCommand('COPY MOVE ' + wrapPath(firstRealPath) + ' TO ' + wrapPath(fileParentPath))
-              DOpus.Output("将目录" + firstRealPath + '移动至' + fileParentPath)
+              DOpus.Output("将目录" + firstRealPath + "移动至" + fileParentPath)
             }
           }
         }

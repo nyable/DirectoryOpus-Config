@@ -1,4 +1,4 @@
-function OnGetNewName (getNewNameData) {
+﻿function OnGetNewName (getNewNameData) {
   var item = getNewNameData.item
   var newName = item.name_stem
   newName = newName.replace(/\[(\d{1,2})\]/g, '- S1E$1')
@@ -11,7 +11,6 @@ function OnGetNewName (getNewNameData) {
 
   var season = getNewNameData.custom.M_SEASON || 1
   newName = newName.replace(/- S\d+E/, '- S' + season + 'E')
-
   return newName + item.ext
 }
 
