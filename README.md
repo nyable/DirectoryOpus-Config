@@ -1,8 +1,8 @@
 # Directory Opus Config
 
-一些关于[Directory Opus 12/13](https://www.gpsoft.com.au/index.html)的设置、脚本、自定义功能记录。
-目前我自用的版本是 DO 13 V13.6.2+ 。
-大多数东西在12和13中都是兼容的，不过13出了一些新的API，比如自定义FAYT等，在12和13的早期版本是用不了的。
+一些关于[Directory Opus 12/13](https://www.gpsoft.com.au/index.html)的设置、脚本、自定义功能记录。  
+目前我自用的版本是 `Directory Opus 13 v13.6.2`+ 。  
+大多数东西在12和13中都是兼容的，不过13出了一些新的API，比如自定义FAYT等，在12和13的早期版本是用不了的。  
 
 ## 目录划分
 
