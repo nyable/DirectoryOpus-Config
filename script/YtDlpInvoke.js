@@ -1,3 +1,5 @@
+///<reference path="./_DOpusDefinitions.d.ts" />
+//@ts-check
 // SmartExtract
 // (c) 2024 nyable
 
@@ -6,15 +8,16 @@
 
 /**
  * 点击时弹出对话框,根据选项调用yt-dlp
+ * @param {DOpusClickData} clickData 
+ * @returns 
  */
 function OnClick (clickData) {
-
-  DOpus.ClearOutput()
+  DOpus.clearOutput()
   var appPath = 'yt-dlp'
 
-  var dlg = DOpus.Dlg()
+  var dlg = DOpus.dlg()
 
-  dlg.window = DOpus.Listers(0)
+  dlg.window = DOpus.listers[0]
   dlg.message = "输入URL后点击解析获取可用格式\n也可以直接下载(最佳可用质量)"
   dlg.title = "yt-dlp"
   dlg.buttons = "直接下载|自定义输出|取消"
@@ -23,37 +26,36 @@ function OnClick (clickData) {
   // dlg.options(0).label = "Checkbox option 1"
   // dlg.options(1).label = "Checkbox option 2"
 
-  var ret = dlg.Show()
+  var ret = dlg.show()
   var url = dlg.input
-  DOpus.Output("Input URL is: " + url)
+  DOpus.output("Input URL is: " + url)
   // DOpus.Output("The two checkboxes were set to " + dlg.options(0).state + " and " + dlg.options(1).state)
 
 
   if (!/^(((ht|f)tps?):\/\/)?.+/.test(url)) {
-    DOpus.Output("URL不合法,不进行任何操作")
-    DOpus.Dlg().Request('输入不合法,不进行操作!', '确定')
+    DOpus.output("URL不合法,不进行任何操作")
+    DOpus.dlg().request('输入不合法,不进行操作!', '确定')
     return
   }
-
   var cmd = clickData.func.command
-  var dirPath = clickData.func.sourcetab.path
+  var dirPath = clickData.func.sourceTab.path
 
-  if (ret == '1') {
-    DOpus.Output("直接下载")
+  if (ret == 1) {
+    DOpus.output("直接下载")
     var r = appPath + ' "' + url + '"' + ' -P "' + dirPath + '"'
-    DOpus.Output('执行命令: ' + r)
-    cmd.RunCommand(r)
-  } else if (ret == '2') {
-    DOpus.Output("自定义格式")
+    DOpus.output('执行命令: ' + r)
+    cmd.runCommand(r)
+  } else if (ret == 2) {
+    DOpus.output("自定义格式")
     var formatInfo = GetFormatInfo(appPath, url)
     if (!formatInfo) {
       var eInfo = "地址:" + url + "解析结果为空,结束执行"
-      DOpus.Output(eInfo)
-      DOpus.Dlg().Request(eInfo, '确定')
+      DOpus.output(eInfo)
+      DOpus.dlg().request(eInfo, '确定')
       return
     }
-    var formatDlg = DOpus.Dlg()
-    formatDlg.window = DOpus.Listers(0)
+    var formatDlg = DOpus.dlg()
+    formatDlg.window = DOpus.listers[0]
     formatDlg.message = "勾选需要的格式化选项,将作为-f后的参数"
     formatDlg.title = formatInfo.title + '[' + formatInfo.id + ']'
     formatDlg.buttons = "确定|取消"
@@ -76,9 +78,9 @@ function OnClick (clickData) {
 
     // formatDlg.options(0).label = "Checkbox option 1"
     // formatDlg.options(1).label = "Checkbox option 2"
-    var formatRet = formatDlg.Show()
+    var formatRet = formatDlg.show()
 
-    DOpus.Output("Dialog.Show returned " + formatRet)
+    DOpus.output("Dialog.Show returned " + formatRet)
     var params = []
     for (var i = 0; i < list.length; i++) {
       var flag = formatDlg.list[i]
@@ -90,12 +92,12 @@ function OnClick (clickData) {
     }
     if (params.length > 0) {
       var r = appPath + ' "' + url + '" -f ' + '"' + params.join('+') + '" -P "' + dirPath + '"'
-      DOpus.Output('执行命令: ' + r)
-      cmd.RunCommand(r)
+      DOpus.output('执行命令: ' + r)
+      cmd.runCommand(r)
     }
 
   } else {
-    DOpus.Output("取消或无定义")
+    DOpus.output("取消或无定义")
   }
 
 
@@ -105,14 +107,14 @@ function OnClick (clickData) {
 }
 
 function GetFormatInfo (appPath, url) {
-  DOpus.Output('获取视频' + url + '格式信息')
+  DOpus.output('获取视频' + url + '格式信息')
   var result = RunEx(appPath, url + " -j")
   if (result.returncode == '0') {
     var obj = JSON.parse(result.stdout)
     var id = obj.id
     var title = obj.title
     var formats = obj.formats
-    DOpus.Output('获取视频' + title + '[' + id + ']' + '格式信息' + formats.length + '条')
+    DOpus.output('获取视频' + title + '[' + id + ']' + '格式信息' + formats.length + '条')
     return obj
   }
 }

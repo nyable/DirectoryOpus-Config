@@ -1,6 +1,9 @@
 # 脚本
 
-要注意脚本文件的格式必须是**UTF-8 with BOM**,而非`UTF-8`，否则在直接安装或导入时，脚本中中文会出现乱码导致导入解析脚本失败
+要注意脚本文件的格式必须是**UTF-8 with BOM**,而非`UTF-8`，否则在直接安装或导入时，脚本中中文会出现乱码导致导入解析脚本失败。  
+[_DOpusDefinitions.d.ts](_DOpusDefinitions.d.ts)是类型提示文件，没有实际上的功能，方便写脚本时命令提示，来源于[cy-gh/DOpus_ScriptingHelper](https://github.com/cy-gh/DOpus_ScriptingHelper)。
+
+
 
 ## 命令
 

@@ -1,4 +1,6 @@
-﻿// SmartExtract
+﻿///<reference path="_DOpusDefinitions.d.ts" />
+//@ts-check
+// SmartExtract
 // (c) 2024 nyable
 
 // This is a script for Directory Opus.
@@ -24,7 +26,7 @@ function OnInit (initData) {
   initData.desc = "自动解压(AutoSmartExtract):SmartExtract fullpath"
   initData.default_enable = true
   initData.min_version = "12.0"
-  DOpus.Output(initData)
+  DOpus.output(initData)
   var cmd = initData.addCommand()
   cmd.name = 'SmartExtract'
   cmd.method = 'OnSmartExtract'
@@ -39,45 +41,52 @@ function OnSmartExtract (cmdData) {
   var args = cmdData.func.args
   var cmd = cmdData.func.command
   if (!args.got_arg.source) {
-    DOpus.Output('Need select a zip file as source', true)
+    DOpus.output('Need select a zip file as source', true)
     return
   }
   var targetList = args.source
-  DOpus.Output(targetList.length)
+  var targetSize = targetList.length
+  DOpus.output('选中' + targetSize + '个文件')
 
-  for (var i = 0; i < targetList.length; i++) {
+  for (var i = 0; i < targetSize; i++) {
     var zipPath = targetList[i]
-    if (DOpus.FSUtil.Exists(zipPath)) {
-      var target = DOpus.FSUtil.GetItem(zipPath)
+    if (DOpus.fsUtil().exists(zipPath)) {
+      var target = DOpus.fsUtil().getItem(zipPath)
       // 文件的全路径
-      var fullPath = target.RealPath
+      var fullPath = target.realpath
       // 文件的简单名称(不包括扩展名)
       var fileNameStem = target.name_stem
       var fileParentPath = target.path
       var extractDir = fileParentPath + '/' + fileNameStem
-      DOpus.Output('开始解压文件:' + fullPath + '=>' + extractDir)
+      DOpus.output('开始解压文件: ' + fullPath + ' => ' + extractDir)
       var result = cmd.RunCommand("COPY " + wrapPath(fullPath) + " EXTRACT=sub HERE")
       if (result) {
-        DOpus.Output('解压完毕:' + fullPath)
-        var folderEnum = DOpus.FSUtil.ReadDir(extractDir)
+        DOpus.output('解压完毕: ' + fullPath)
+        var folderEnum = DOpus.fsUtil().readDir(extractDir)
+
         while (!folderEnum.complete) {
-          // 如果只有1个文件夹且文件夹是同名文件夹则往上一级移动
-          var files = folderEnum.Next(5)
-          var fileCount = files.count
+          // 读前3个文件就够了,如果只有1个文件夹且文件夹是同名文件夹则往上一级移动,否则不作处理
+          /**
+           * @type {DOpusVector}
+           */
+          var innerRootFiles = folderEnum.next(3)
+          var fileCount = innerRootFiles.count
           if (fileCount == 1) {
-            var firstFile = files[0]
+            var firstFile = innerRootFiles[0]
             if (firstFile.is_dir && firstFile.name == fileNameStem) {
               var firstRealPath = firstFile.RealPath
               cmd.RunCommand('COPY MOVE ' + wrapPath(firstRealPath) + ' TO ' + wrapPath(fileParentPath))
-              DOpus.Output("将目录" + firstRealPath + "移动至" + fileParentPath)
+              DOpus.output("将目录: " + firstRealPath + " 移动至 " + fileParentPath)
             }
           }
+          break
         }
+
       } else {
-        DOpus.Output('解压失败:' + fullPath, true)
+        DOpus.output('解压失败: ' + fullPath, true)
       }
     } else {
-      DOpus.Output('解压时文件不存在,跳过该文件:' + zipPath, true)
+      DOpus.output('解压时文件不存在,跳过该文件: ' + zipPath, true)
       continue
     }
 
