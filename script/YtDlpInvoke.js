@@ -68,7 +68,7 @@ function OnClick (clickData) {
 
     for (var i = 0; i < formatList.length; i++) {
       var fo = formatList[i]
-      choices.push(rightPad(i, 3) + '. ' + fo.ext + '(' + fo.resolution + ')   ' + (fo.filesize ? (formatBytes(fo.filesize)) : 'unknown') + '  ' + fo.format)
+      choices.push(leftPad(i, 3) + '. ' + fo.ext + '(' + fo.resolution + ')   ' + (fo.filesize ? (formatBytes(fo.filesize)) : 'unknown') + '  ' + fo.format)
       list.push(false)
     }
 
@@ -101,11 +101,16 @@ function OnClick (clickData) {
   }
 
 
-
-
-
 }
 
+
+/**
+ * 获取视频URL可用格式的JSON对象
+ * 
+ * @param {string} appPath  yt-dlp可执行文件的路径,加到path后就不需要全路径了
+ * @param {string} url 目标网址
+ * @returns 返回JSON对象
+ */
 function GetFormatInfo (appPath, url) {
   DOpus.output('获取视频' + url + '格式信息')
   var result = RunEx(appPath, url + " -j")
@@ -119,14 +124,27 @@ function GetFormatInfo (appPath, url) {
   }
 }
 
-function rightPad (str, len) {
+/**
+ * 向左补0
+ * @param {string|number} str 字符串
+ * @param {number} len 长度
+ * @returns 补零后的结果
+ */
+function leftPad (str, len) {
+  str = str + ''
   while (str.length < len) {
     str = "0" + str
   }
   return str
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * 通过shell执行命令并获取标准输入和输出
+ * 
+ * @param {string} exe 命令
+ * @param {*} params 参数
+ * @returns 结果对象
+ */
 function RunEx (exe, params) {
   params = (params ? " " + params : "")
   var shell = new ActiveXObject("WScript.Shell")
@@ -145,6 +163,11 @@ function RunEx (exe, params) {
   }
 }
 
+/**
+ * 格式化为便于人类阅读的字符串
+ * @param {number} bytes 字节数
+ * @returns 大小字符串
+ */
 function formatBytes (bytes) {
   if (bytes === undefined || bytes === null) {
     return "unknown"
