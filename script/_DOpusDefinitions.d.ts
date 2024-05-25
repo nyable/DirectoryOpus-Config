@@ -1068,7 +1068,7 @@ interface DOpusControl {
    *
    * Note that for a multiple-selection list box or list view, this value will return a Vector of DialogListItem objects, representing all currently selected items.
    */
-  readonly value: DOpusDialogListItem;
+  value: any;
 
   /**
    * Set or query the visible state of the control. Returns True if the control is visible and False if it's hidden. You can set this property to hide or show the control.

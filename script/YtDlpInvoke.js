@@ -12,7 +12,6 @@
  * @returns 
  */
 function OnClick (clickData) {
-  DOpus.clearOutput()
   var appPath = 'yt-dlp'
 
   var dlg = DOpus.dlg()
