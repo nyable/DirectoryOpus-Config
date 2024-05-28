@@ -1028,7 +1028,7 @@ interface DOpusControl {
    *
    * For a static control set to "image" mode you can also provide an Image object that you obtained from the DOpus.LoadImage or Script.LoadImage methods.
    */
-  readonly label: DOpusImage;
+  label: any;
 
   /**
    * For a list view control, lets you change or query the current view mode. Valid values are icon, details, smallicon, list.
@@ -2067,7 +2067,7 @@ interface DOpusDialogListItem {
   /**
    * Returns or sets the optional data value associated with this item.
    */
-  readonly data: number;
+  data: number;
 
   /**
    * For a list view control, returns or sets the disable state of this item. When a list view item is disabled it appears ghosted and can't be selected or right-clicked.
@@ -7029,7 +7029,7 @@ interface DOpusTab {
   /**
    * Returns a collection of Item objects that represents all the selected files and folders currently displayed in this tab. Note that if checkbox mode is turned on in the tab, this will be a collection of checked items rather than selected.
    */
-  readonly selected: DOpusItem;
+  readonly selected: DOpusVector<DOpusItem>;
 
   /**
    * Returns a collection of Item objects that represents all the selected folders currently displayed in this tab.

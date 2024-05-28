@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<button backcol="none" display="both" dropdown_glyph="yes" label_pos="right" popout="bottom" textcol="none" type="menu">
+	<label>FFmpeg</label>
+	<tip>Quick FFmpeg command</tip>
+	<icon1>#FFmpeg</icon1>
+	<button backcol="none" display="both" label_pos="right" textcol="none">
+		<label>视频转换</label>
+		<tip>Convert Video Type</tip>
+		<icon1>#Videos</icon1>
+		<function type="script">
+			<instruction>@disablenosel:files,type=(*.(mp4|mkv|avi|flv|asf|wmv|3gp|f4v))</instruction>
+			<instruction>@script JScript</instruction>
+			<instruction>function createDialog (clickData) {</instruction>
+			<instruction>  var dlg = DOpus.dlg()</instruction>
+			<instruction>  dlg.window = clickData.func.sourcetab</instruction>
+			<instruction>  dlg.message = DOpus.strings.get(&quot;dlgMsg&quot;)</instruction>
+			<instruction>  dlg.title = DOpus.strings.get(&quot;dlgTitle&quot;)</instruction>
+			<instruction>  dlg.buttons = DOpus.strings.get(&quot;button&quot;)</instruction>
+			<instruction>  dlg.choices = DOpus.create().vector(&apos;mp4&apos;, &apos;mkv&apos;, &apos;avi&apos;, &apos;flv&apos;, &apos;asf&apos;, &apos;wmv&apos;, &apos;3gp&apos;, &apos;f4v&apos;)</instruction>
+			<instruction>  dlg.selection = 0</instruction>
+			<instruction>  dlg.sort = false</instruction>
+			<instruction>  return dlg</instruction>
+			<instruction>}</instruction>
+			<instruction />
+			<instruction>function OnClick (clickData) {</instruction>
+			<instruction>  DOpus.clearOutput()</instruction>
+			<instruction>  // --------------------------------------------------------</instruction>
+			<instruction>  var cmd = clickData.func.command</instruction>
+			<instruction>  cmd.deselect = false // Prevent automatic deselection</instruction>
+			<instruction>  // --------------------------------------------------------</instruction>
+			<instruction />
+			<instruction />
+			<instruction>  // --------------------------------------------------------</instruction>
+			<instruction>  DOpus.output(&quot;Selected items in &quot; + clickData.func.sourcetab.path + &quot;:&quot;)</instruction>
+			<instruction />
+			<instruction>  var count = clickData.func.sourcetab.selected.count</instruction>
+			<instruction>  if (count &gt; 0) {</instruction>
+			<instruction>    var dlg = createDialog(clickData)</instruction>
+			<instruction>    var ret = dlg.show()</instruction>
+			<instruction>    if (ret) {</instruction>
+			<instruction>      var targetExt = dlg.choices[dlg.selection]</instruction>
+			<instruction>      if (targetExt) {</instruction>
+			<instruction>        var factory = DOpus.create()</instruction>
+			<instruction>        DOpus.output(&quot;  Selected file count:&quot; + count)</instruction>
+			<instruction>        for (var eSel = new Enumerator(clickData.func.sourcetab.selected); !eSel.atEnd(); eSel.moveNext()) {</instruction>
+			<instruction>          if (!eSel.item().is_dir) {</instruction>
+			<instruction>            var item = eSel.item()</instruction>
+			<instruction>            var realPath = item.realpath</instruction>
+			<instruction>            var dirPath = item.path</instruction>
+			<instruction>            var pureName = item.name_stem</instruction>
+			<instruction>            var date = factory.date().format(&quot;D#_yyyyMMdd_T#HHmmss&quot;)</instruction>
+			<instruction>            DOpus.output(&quot;  file: &quot; + realPath)</instruction>
+			<instruction>            var script = &apos;@sync:ffmpeg -i &quot;&apos; + realPath + &apos;&quot; -c copy &quot;&apos; + dirPath + &apos;\\&apos; + pureName + date + &apos;.&apos; + targetExt + &apos;&quot; &apos;</instruction>
+			<instruction>            DOpus.output(script)</instruction>
+			<instruction>            //cmd.AddLine(&apos;@runmode:hide&apos;)</instruction>
+			<instruction>            cmd.AddLine(script)</instruction>
+			<instruction>            cmd.Run()</instruction>
+			<instruction>            cmd.Clear()</instruction>
+			<instruction>          }</instruction>
+			<instruction>        }</instruction>
+			<instruction>      }</instruction>
+			<instruction>    } else {</instruction>
+			<instruction>      return</instruction>
+			<instruction>    }</instruction>
+			<instruction>  }</instruction>
+			<instruction>}</instruction>
+			<instruction>==SCRIPT RESOURCES</instruction>
+			<instruction>&lt;resources&gt;</instruction>
+			<instruction>    &lt;resource type=&quot;strings&quot;&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;chs&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgTitle&quot; text=&quot;视频转换&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;english&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgTitle&quot; text=&quot;Video Convert&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>    &lt;/resource&gt;</instruction>
+			<instruction>    &lt;resource type=&quot;strings&quot;&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;chs&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgMsg&quot; text=&quot;选择目标视频格式：&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;english&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgMsg&quot; text=&quot;Select target video format:&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>    &lt;/resource&gt;</instruction>
+			<instruction>    &lt;resource type=&quot;strings&quot;&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;chs&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;button&quot; text=&quot;确定|取消&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;english&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;button&quot; text=&quot;OK|Cancel&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>    &lt;/resource&gt;</instruction>
+			<instruction>&lt;/resources&gt;</instruction>
+		</function>
+	</button>
+	<button backcol="none" display="both" label_pos="right" textcol="none">
+		<label>图片转换</label>
+		<tip>Convert Image Type</tip>
+		<icon1>#imageconversion</icon1>
+		<function type="script">
+			<instruction>@disablenosel:files,type=(*.(jpg|png|webp))</instruction>
+			<instruction>@script JScript</instruction>
+			<instruction>function createDialog (clickData) {</instruction>
+			<instruction>  var dlg = DOpus.dlg()</instruction>
+			<instruction>  dlg.window = clickData.func.sourcetab</instruction>
+			<instruction>  dlg.message = DOpus.strings.get(&quot;dlgMsg&quot;)</instruction>
+			<instruction>  dlg.title = DOpus.strings.get(&quot;dlgTitle&quot;)</instruction>
+			<instruction>  dlg.buttons = DOpus.strings.get(&quot;button&quot;)</instruction>
+			<instruction>  dlg.choices = DOpus.create().vector(&apos;jpg&apos;, &apos;png&apos;, &apos;webp&apos;)</instruction>
+			<instruction>  dlg.selection = 0</instruction>
+			<instruction>  return dlg</instruction>
+			<instruction>}</instruction>
+			<instruction />
+			<instruction>function OnClick (clickData) {</instruction>
+			<instruction>  DOpus.clearOutput()</instruction>
+			<instruction>  // --------------------------------------------------------</instruction>
+			<instruction>  var cmd = clickData.func.command</instruction>
+			<instruction>  cmd.deselect = false // Prevent automatic deselection</instruction>
+			<instruction />
+			<instruction />
+			<instruction>  DOpus.output(&quot;Selected items in &quot; + clickData.func.sourcetab.path + &quot;:&quot;)</instruction>
+			<instruction>  var selected = clickData.func.sourcetab.selected</instruction>
+			<instruction>  var count = selected.count</instruction>
+			<instruction>  if (count &gt; 0) {</instruction>
+			<instruction>    var dlg = createDialog(clickData)</instruction>
+			<instruction>    var ret = dlg.show()</instruction>
+			<instruction>    if (ret) {</instruction>
+			<instruction>      var targetExt = dlg.choices[dlg.selection]</instruction>
+			<instruction>      if (targetExt) {</instruction>
+			<instruction>        var factory = DOpus.create()</instruction>
+			<instruction>        DOpus.output(&quot;  Selected file count:&quot; + count)</instruction>
+			<instruction>        for (var eSel = new Enumerator(selected); !eSel.atEnd(); eSel.moveNext()) {</instruction>
+			<instruction>          if (!eSel.item().is_dir) {</instruction>
+			<instruction>            var item = eSel.item()</instruction>
+			<instruction>            var realPath = item.realpath</instruction>
+			<instruction>            var dirPath = item.path</instruction>
+			<instruction>            var pureName = item.name_stem</instruction>
+			<instruction>            var date = factory.date().format(&quot;D#_yyyyMMdd_T#HHmmss&quot;)</instruction>
+			<instruction>            var newFileName = dirPath + &apos;\\&apos; + pureName + date + &apos;.&apos; + targetExt</instruction>
+			<instruction>            var script = &apos;@sync:ffmpeg -i &quot;&apos; + realPath + &apos;&quot;  &quot;&apos; + newFileName + &apos;&quot; &apos;</instruction>
+			<instruction>            cmd.AddLine(script)</instruction>
+			<instruction>            cmd.Run()</instruction>
+			<instruction>            DOpus.output(&apos;Run script: &apos; + script)</instruction>
+			<instruction>            cmd.Clear()</instruction>
+			<instruction>          }</instruction>
+			<instruction>        }</instruction>
+			<instruction>      }</instruction>
+			<instruction>    } else {</instruction>
+			<instruction>      return</instruction>
+			<instruction>    }</instruction>
+			<instruction>  }</instruction>
+			<instruction>}</instruction>
+			<instruction>==SCRIPT RESOURCES</instruction>
+			<instruction>&lt;resources&gt;</instruction>
+			<instruction>    &lt;resource type=&quot;strings&quot;&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;chs&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgTitle&quot; text=&quot;图片转换&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;english&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgTitle&quot; text=&quot;Image Convert&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>    &lt;/resource&gt;</instruction>
+			<instruction>    &lt;resource type=&quot;strings&quot;&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;chs&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgMsg&quot; text=&quot;选择目标图片格式：&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;english&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;dlgMsg&quot; text=&quot;Select target image format:&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>    &lt;/resource&gt;</instruction>
+			<instruction>    &lt;resource type=&quot;strings&quot;&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;chs&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;button&quot; text=&quot;确定|取消&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>        &lt;strings lang=&quot;english&quot;&gt;</instruction>
+			<instruction>            &lt;string id=&quot;button&quot; text=&quot;OK|Cancel&quot; /&gt;</instruction>
+			<instruction>        &lt;/strings&gt;</instruction>
+			<instruction>    &lt;/resource&gt;</instruction>
+			<instruction>&lt;/resources&gt;</instruction>
+		</function>
+	</button>
+	<button backcol="none" display="both" label_pos="right" textcol="none">
+		<label>快速压制</label>
+		<icon1>#FFmpeg</icon1>
+		<function type="script">
+			<instruction>@script JScript</instruction>
+			<instruction>///&lt;reference path=&quot;./_DOpusDefinitions.d.ts&quot; /&gt;</instruction>
+			<instruction>//@ts-check</instruction>
+			<instruction>// (c) 2024 nyable</instruction>
+			<instruction />
+			<instruction>var FFMPEG_PATH = &apos;ffmpeg&apos;</instruction>
+			<instruction>// control key</instruction>
+			<instruction>var INPUT = &apos;input&apos;</instruction>
+			<instruction>var MAIN = &apos;main&apos;</instruction>
+			<instruction>var CRF_TAB_NAME = &apos;tab1&apos;</instruction>
+			<instruction>var ABR_TAB_NAME = &apos;tab2&apos;</instruction>
+			<instruction>var CRF = {</instruction>
+			<instruction>  VCODEC: {</instruction>
+			<instruction>    name: &apos;CRF_VCODEC&apos;,</instruction>
+			<instruction>    type: &apos;select&apos;,</instruction>
+			<instruction>    value: &apos;libx264&apos;,</instruction>
+			<instruction>    options: [&apos;libx264&apos;, &apos;libx265&apos;]</instruction>
+			<instruction>  },</instruction>
+			<instruction>  CRF: {</instruction>
+			<instruction>    name: &apos;CRF_CRF&apos;,</instruction>
+			<instruction>    type: &apos;text&apos;,</instruction>
+			<instruction>    value: &apos;23&apos;,</instruction>
+			<instruction>    options: []</instruction>
+			<instruction>  },</instruction>
+			<instruction>  BPS: {</instruction>
+			<instruction>    name: &apos;CRF_BPS&apos;,</instruction>
+			<instruction>    type: &apos;text&apos;,</instruction>
+			<instruction>    value: &apos;192k&apos;,</instruction>
+			<instruction>    options: []</instruction>
+			<instruction>  },</instruction>
+			<instruction>  PRESET: {</instruction>
+			<instruction>    name: &apos;CRF_PRESET&apos;,</instruction>
+			<instruction>    type: &apos;select&apos;,</instruction>
+			<instruction>    value: &apos;medium&apos;,</instruction>
+			<instruction>    options: [&apos;ultrafast&apos;, &apos;superfast&apos;, &apos;veryfast&apos;, &apos;faster&apos;, &apos;fast&apos;, &apos;medium&apos;, &apos;slow&apos;, &apos;slower&apos;, &apos;veryslow&apos;]</instruction>
+			<instruction>  },</instruction>
+			<instruction>  OUTPUT: {</instruction>
+			<instruction>    name: &apos;CRF_OUTPUT&apos;,</instruction>
+			<instruction>    type: &apos;text&apos;,</instruction>
+			<instruction>    value: &apos;&apos;,</instruction>
+			<instruction>    options: []</instruction>
+			<instruction>  },</instruction>
+			<instruction>}</instruction>
+			<instruction />
+			<instruction>var ABR = {</instruction>
+			<instruction>  VCODEC: {</instruction>
+			<instruction>    name: &apos;ABR_VCODEC&apos;,</instruction>
+			<instruction>    type: &apos;select&apos;,</instruction>
+			<instruction>    value: &apos;libx264&apos;,</instruction>
+			<instruction>    options: [&apos;libx264&apos;, &apos;libx265&apos;]</instruction>
+			<instruction>  },</instruction>
+			<instruction>  ABR: {</instruction>
+			<instruction>    name: &apos;ABR_ABR&apos;,</instruction>
+			<instruction>    type: &apos;text&apos;,</instruction>
+			<instruction>    value: &apos;23&apos;,</instruction>
+			<instruction>    options: []</instruction>
+			<instruction>  },</instruction>
+			<instruction>  BPS: {</instruction>
+			<instruction>    name: &apos;ABR_BPS&apos;,</instruction>
+			<instruction>    type: &apos;text&apos;,</instruction>
+			<instruction>    value: &apos;192k&apos;,</instruction>
+			<instruction>    options: []</instruction>
+			<instruction>  },</instruction>
+			<instruction>  PRESET: {</instruction>
+			<instruction>    name: &apos;ABR_PRESET&apos;,</instruction>
+			<instruction>    type: &apos;select&apos;,</instruction>
+			<instruction>    value: &apos;medium&apos;,</instruction>
+			<instruction>    options: [&apos;ultrafast&apos;, &apos;superfast&apos;, &apos;veryfast&apos;, &apos;faster&apos;, &apos;fast&apos;, &apos;medium&apos;, &apos;slow&apos;, &apos;slower&apos;, &apos;veryslow&apos;]</instruction>
+			<instruction>  },</instruction>
+			<instruction>  OUTPUT: {</instruction>
+			<instruction>    name: &apos;ABR_OUTPUT&apos;,</instruction>
+			<instruction>    type: &apos;text&apos;,</instruction>
+			<instruction>    value: &apos;&apos;,</instruction>
+			<instruction>    options: []</instruction>
+			<instruction>  },</instruction>
+			<instruction>}</instruction>
+			<instruction />
+			<instruction>/**</instruction>
+			<instruction> * @param {DOpusClickData} clickData </instruction>
+			<instruction> * @returns </instruction>
+			<instruction> */</instruction>
+			<instruction>function OnClick (clickData) {</instruction>
+			<instruction />
+			<instruction>  var selected = clickData.func.sourceTab.selected</instruction>
+			<instruction>  var fileCount = selected.count</instruction>
+			<instruction>  if (fileCount &gt; 1) {</instruction>
+			<instruction>    DOpus.dlg().request(&apos;只能选中一个文件&apos;, &apos;确定&apos;)</instruction>
+			<instruction>    return</instruction>
+			<instruction>  }</instruction>
+			<instruction />
+			<instruction />
+			<instruction>  var dlg = DOpus.dlg()</instruction>
+			<instruction>  dlg.window = clickData.func.sourceTab.lister</instruction>
+			<instruction>  dlg.template = &apos;main&apos;</instruction>
+			<instruction>  dlg.detach = true</instruction>
+			<instruction>  dlg.create()</instruction>
+			<instruction>  if (fileCount == 1) {</instruction>
+			<instruction>    dlg.control(INPUT, MAIN).value = selected[0].realpath</instruction>
+			<instruction>  }</instruction>
+			<instruction />
+			<instruction />
+			<instruction />
+			<instruction>  //初始化</instruction>
+			<instruction>  setupDefault(dlg, CRF, CRF_TAB_NAME)</instruction>
+			<instruction>  setupDefault(dlg, ABR, ABR_TAB_NAME)</instruction>
+			<instruction />
+			<instruction>  dlg.show()</instruction>
+			<instruction />
+			<instruction>  while (true) {</instruction>
+			<instruction>    var msg = dlg.getMsg()</instruction>
+			<instruction>    var event = msg.event</instruction>
+			<instruction>    var control = msg.control</instruction>
+			<instruction>    DOpus.output(&quot;result=&gt;&quot; + msg.result + &apos; event=&gt;&apos; + event + &apos; control=&gt;&apos; + control)</instruction>
+			<instruction>    if (!msg.result) {</instruction>
+			<instruction>      break</instruction>
+			<instruction>    }</instruction>
+			<instruction />
+			<instruction>    if (event == &apos;click&apos;) {</instruction>
+			<instruction>      if (control == &apos;bt_confirm&apos;) {</instruction>
+			<instruction>        var mode = dlg.control(&apos;tabs&apos;).value</instruction>
+			<instruction>        var command = FFMPEG_PATH</instruction>
+			<instruction>        var inputPath = dlg.control(INPUT, MAIN).value</instruction>
+			<instruction>        if (!DOpus.fsUtil().exists(inputPath)) {</instruction>
+			<instruction>          DOpus.dlg().request(&apos;输入文件不存在，请确认&apos;, &apos;确定&apos;)</instruction>
+			<instruction>          continue</instruction>
+			<instruction>        }</instruction>
+			<instruction>        var inputItem = DOpus.fsUtil().getItem(inputPath)</instruction>
+			<instruction>        var outputPath = dlg.control(CRF.OUTPUT.name, CRF_TAB_NAME).value</instruction>
+			<instruction>        if (!outputPath) {</instruction>
+			<instruction>          outputPath = inputItem.path + &apos;/&apos; + inputItem.name_stem + new Date().getTime() + &apos;.mp4&apos;</instruction>
+			<instruction>        }</instruction>
+			<instruction />
+			<instruction>        command += &apos; -i &quot;&apos; + inputPath + &apos;&quot; &apos;</instruction>
+			<instruction />
+			<instruction>        if (mode == 0) {</instruction>
+			<instruction>          // CRF</instruction>
+			<instruction>          command += &apos; -map_metadata -1 -pix_fmt yuv420p &apos;</instruction>
+			<instruction>          command += &apos; -vcodec &apos; + dlg.control(CRF.VCODEC.name, CRF_TAB_NAME).label + &apos; &apos;</instruction>
+			<instruction>          command += &apos; -preset &apos; + dlg.control(CRF.PRESET.name, CRF_TAB_NAME).label + &apos; &apos;</instruction>
+			<instruction>          command += &apos;  -x264opts cabac=1:interlaced=0:crf=&apos; + dlg.control(CRF.CRF.name, CRF_TAB_NAME).value + &apos; &apos;</instruction>
+			<instruction>          command += &apos; -acodec aac &apos;</instruction>
+			<instruction>          command += &apos;  -ab &apos; + dlg.control(CRF.BPS.name, CRF_TAB_NAME).value + &apos; &apos;</instruction>
+			<instruction>          command += &apos; -af aresample=async=1000  &apos;</instruction>
+			<instruction>          command += &apos; -metadata comment=&quot;Transcoded by FFMpeg&quot; &apos;</instruction>
+			<instruction>          command += &apos; -f mp4&apos;</instruction>
+			<instruction>          command += &apos; -movflags +faststart &apos;</instruction>
+			<instruction>          command += &apos; -max_muxing_queue_size 1024 &apos;</instruction>
+			<instruction>          command += &apos; -y &quot;&apos; + outputPath + &apos;&quot; &apos;</instruction>
+			<instruction>          clickData.func.command.runCommand(command)</instruction>
+			<instruction />
+			<instruction>        } else if (mode == 1) {</instruction>
+			<instruction>          // ABR</instruction>
+			<instruction>          DOpus.dlg().request(&quot;未实现该功能&quot;, &quot;确定&quot;)</instruction>
+			<instruction>          continue</instruction>
+			<instruction>        }</instruction>
+			<instruction>        DOpus.output(&quot;Run command:\n&quot; + command)</instruction>
+			<instruction>        dlg.endDlg()</instruction>
+			<instruction>      } else if (control == &apos;bt_close&apos;) {</instruction>
+			<instruction>        dlg.endDlg()</instruction>
+			<instruction>      }</instruction>
+			<instruction>    }</instruction>
+			<instruction>  }</instruction>
+			<instruction>  // dlg.control(&apos;vcodec&apos;, &apos;tab1&apos;).value = &apos;libx264&apos;</instruction>
+			<instruction />
+			<instruction>}</instruction>
+			<instruction />
+			<instruction />
+			<instruction />
+			<instruction>/**</instruction>
+			<instruction> * 装载默认值</instruction>
+			<instruction> * @param {DOpusDialog} dlg </instruction>
+			<instruction> * @param {*} defaultObj </instruction>
+			<instruction> * @param {string} pName </instruction>
+			<instruction> */</instruction>
+			<instruction>function setupDefault (dlg, defaultObj, pName) {</instruction>
+			<instruction>  for (var key in defaultObj) {</instruction>
+			<instruction>    var op = defaultObj[key]</instruction>
+			<instruction>    var opName = op.name</instruction>
+			<instruction>    var type = op.type</instruction>
+			<instruction>    var control = dlg.control(opName, pName)</instruction>
+			<instruction>    if (type == &apos;text&apos;) {</instruction>
+			<instruction>      control.value = op.value</instruction>
+			<instruction>    } else if (type == &apos;select&apos;) {</instruction>
+			<instruction>      var subItems = op.options</instruction>
+			<instruction>      var defaultIndex = 0</instruction>
+			<instruction>      for (var i = 0; i &lt; subItems.length; i++) {</instruction>
+			<instruction>        var subItem = subItems[i]</instruction>
+			<instruction>        control.addItem(subItem)</instruction>
+			<instruction>        if (subItem == op.value) {</instruction>
+			<instruction>          defaultIndex = i</instruction>
+			<instruction>        }</instruction>
+			<instruction>      }</instruction>
+			<instruction>      control.label = op.value</instruction>
+			<instruction>    }</instruction>
+			<instruction>  }</instruction>
+			<instruction>}</instruction>
+			<instruction>==SCRIPT RESOURCES</instruction>
+			<instruction>&lt;resources&gt;</instruction>
+			<instruction>	&lt;resource name=&quot;main&quot; type=&quot;dialog&quot;&gt;</instruction>
+			<instruction>		&lt;dialog height=&quot;180&quot; lang=&quot;chs&quot; width=&quot;270&quot;&gt;</instruction>
+			<instruction>			&lt;control height=&quot;126&quot; name=&quot;tabs&quot; type=&quot;tab&quot; width=&quot;258&quot; x=&quot;6&quot; y=&quot;24&quot;&gt;</instruction>
+			<instruction>				&lt;tabs&gt;</instruction>
+			<instruction>					&lt;tab dialog=&quot;tab1&quot; /&gt;</instruction>
+			<instruction>					&lt;tab dialog=&quot;tab2&quot; /&gt;</instruction>
+			<instruction>				&lt;/tabs&gt;</instruction>
+			<instruction>			&lt;/control&gt;</instruction>
+			<instruction>			&lt;control default=&quot;yes&quot; height=&quot;14&quot; imagelabel=&quot;yes&quot; name=&quot;bt_confirm&quot; title=&quot;开始压制&quot; type=&quot;button&quot; width=&quot;50&quot; x=&quot;74&quot; y=&quot;156&quot; /&gt;</instruction>
+			<instruction>			&lt;control height=&quot;14&quot; name=&quot;bt_close&quot; title=&quot;关闭&quot; type=&quot;button&quot; width=&quot;50&quot; x=&quot;146&quot; y=&quot;156&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;input&quot; type=&quot;edit&quot; width=&quot;234&quot; x=&quot;30&quot; y=&quot;6&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;center&quot; height=&quot;12&quot; name=&quot;static1&quot; title=&quot;输入：&quot; type=&quot;static&quot; valign=&quot;center&quot; width=&quot;24&quot; x=&quot;6&quot; y=&quot;6&quot; /&gt;</instruction>
+			<instruction>		&lt;/dialog&gt;</instruction>
+			<instruction>	&lt;/resource&gt;</instruction>
+			<instruction>	&lt;resource name=&quot;tab1&quot; type=&quot;dialog&quot;&gt;</instruction>
+			<instruction>		&lt;dialog height=&quot;100&quot; lang=&quot;chs&quot; title=&quot;CRF恒定画质&quot; width=&quot;180&quot;&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static1&quot; title=&quot;视频编码器&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;10&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static2&quot; title=&quot;CRF&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;28&quot; /&gt;</instruction>
+			<instruction>			&lt;control case=&quot;lower&quot; halign=&quot;left&quot; height=&quot;12&quot; name=&quot;CRF_CRF&quot; title=&quot;23&quot; type=&quot;edit&quot; updown=&quot;yes&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;26&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static3&quot; title=&quot;音频比特率&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;46&quot; /&gt;</instruction>
+			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;CRF_VCODEC&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;8&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;CRF_BPS&quot; title=&quot;192k&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;44&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static4&quot; title=&quot;预设&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;64&quot; /&gt;</instruction>
+			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;CRF_PRESET&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;62&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static5&quot; title=&quot;输出路径&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;82&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;CRF_OUTPUT&quot; title=&quot; &quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;80&quot; /&gt;</instruction>
+			<instruction>		&lt;/dialog&gt;</instruction>
+			<instruction>	&lt;/resource&gt;</instruction>
+			<instruction>	&lt;resource name=&quot;tab2&quot; type=&quot;dialog&quot;&gt;</instruction>
+			<instruction>		&lt;dialog height=&quot;100&quot; lang=&quot;chs&quot; title=&quot;ABR平均码率&quot; width=&quot;180&quot;&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static2&quot; title=&quot;ABR&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;28&quot; /&gt;</instruction>
+			<instruction>			&lt;control case=&quot;lower&quot; halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_ABR&quot; number=&quot;yes&quot; title=&quot;2400&quot; type=&quot;edit&quot; updown=&quot;yes&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;26&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static3&quot; title=&quot;音频比特率&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;46&quot; /&gt;</instruction>
+			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;ABR_VCODEC&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;8&quot;&gt;</instruction>
+			<instruction>				&lt;contents&gt;</instruction>
+			<instruction>					&lt;item text=&quot;libx264&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;libx265&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;mpeg4&quot; /&gt;</instruction>
+			<instruction>				&lt;/contents&gt;</instruction>
+			<instruction>			&lt;/control&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_BPS&quot; title=&quot;128k&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;44&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static4&quot; title=&quot;预设&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;64&quot; /&gt;</instruction>
+			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;ABR_PRESET&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;62&quot;&gt;</instruction>
+			<instruction>				&lt;contents&gt;</instruction>
+			<instruction>					&lt;item text=&quot;ultrafast&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;superfast&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;veryfast&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;faster&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;fast&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;medium&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;slow&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;slower&quot; /&gt;</instruction>
+			<instruction>					&lt;item text=&quot;veryslow&quot; /&gt;</instruction>
+			<instruction>				&lt;/contents&gt;</instruction>
+			<instruction>			&lt;/control&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static5&quot; title=&quot;输出路径&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;82&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_OUTPUT&quot; title=&quot;.&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;80&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static1&quot; title=&quot;视频编码器&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;10&quot; /&gt;</instruction>
+			<instruction>		&lt;/dialog&gt;</instruction>
+			<instruction>	&lt;/resource&gt;</instruction>
+			<instruction>&lt;/resources&gt;</instruction>
+		</function>
+	</button>
+</button>
