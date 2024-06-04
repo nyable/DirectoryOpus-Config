@@ -5,6 +5,8 @@
 var FFMPEG_PATH = 'ffmpeg'
 // control key
 var INPUT = 'input'
+var SUBTITLE = 'subtitle'
+
 var MAIN = 'main'
 var CRF_TAB_NAME = 'tab1'
 var ABR_TAB_NAME = 'tab2'
@@ -51,7 +53,7 @@ var ABR = {
   ABR: {
     name: 'ABR_ABR',
     type: 'text',
-    value: '23',
+    value: 2400,
     options: []
   },
   BPS: {
@@ -74,6 +76,7 @@ var ABR = {
   },
 }
 
+
 /**
  * @param {DOpusClickData} clickData 
  * @returns 
@@ -94,7 +97,10 @@ function OnClick (clickData) {
   dlg.detach = true
   dlg.create()
   if (fileCount == 1) {
-    dlg.control(INPUT, MAIN).value = selected[0].realpath
+    var firstSel = selected[0]
+    if (!firstSel.is_dir) {
+      dlg.control(INPUT, MAIN).value = firstSel.realpath
+    }
   }
 
 
@@ -106,6 +112,7 @@ function OnClick (clickData) {
   dlg.show()
 
   while (true) {
+
     var msg = dlg.getMsg()
     var event = msg.event
     var control = msg.control
@@ -126,17 +133,22 @@ function OnClick (clickData) {
         var inputItem = DOpus.fsUtil().getItem(inputPath)
         var outputPath = dlg.control(CRF.OUTPUT.name, CRF_TAB_NAME).value
         if (!outputPath) {
-          outputPath = inputItem.path + '/' + inputItem.name_stem + new Date().getTime() + '.mp4'
+          outputPath = inputItem.path + '/' + inputItem.name_stem + DOpus.create().date().format('A#_yyyyMMdd_HHmmss') + '.mp4'
         }
 
         command += ' -i "' + inputPath + '" '
+
+        var subtitleInput = String(dlg.control(SUBTITLE, MAIN).value)
+        if (subtitleInput) {
+          subtitleInput = subtitleInput.replace(/\\/g, '/')
+        }
 
         if (mode == 0) {
           // CRF
           command += ' -map_metadata -1 -pix_fmt yuv420p '
           command += ' -vcodec ' + dlg.control(CRF.VCODEC.name, CRF_TAB_NAME).label + ' '
           command += ' -preset ' + dlg.control(CRF.PRESET.name, CRF_TAB_NAME).label + ' '
-          command += '  -x264opts cabac=1:interlaced=0:crf=' + dlg.control(CRF.CRF.name, CRF_TAB_NAME).value + ' '
+          command += '  -x264opts keyint=300:min-keyint=1:ref=4:bframes=3:me=umh:scenecut=60:qcomp=0.5:psy-rd=0.3,0:aq-mode=2:aq-strength=0.8:cabac=1:interlaced=0:crf=' + dlg.control(CRF.CRF.name, CRF_TAB_NAME).value + ' '
           command += ' -acodec aac '
           command += '  -ab ' + dlg.control(CRF.BPS.name, CRF_TAB_NAME).value + ' '
           command += ' -af aresample=async=1000  '
@@ -144,18 +156,46 @@ function OnClick (clickData) {
           command += ' -f mp4'
           command += ' -movflags +faststart '
           command += ' -max_muxing_queue_size 1024 '
+          if (subtitleInput) {
+            command += ' -filter_complex "subtitles=\\\'' + subtitleInput + '\\\'" '
+          }
           command += ' -y "' + outputPath + '" '
+
+          DOpus.output("Run command:\n" + command)
           clickData.func.command.runCommand(command)
 
         } else if (mode == 1) {
           // ABR
-          DOpus.dlg().request("未实现该功能", "确定")
-          continue
+          command += ' -map_metadata -1 '
+          command += ' -pix_fmt yuv420p '
+          command += ' -vcodec ' + dlg.control(ABR.VCODEC.name, ABR_TAB_NAME).label + ' '
+          command += ' -preset ' + dlg.control(ABR.PRESET.name, ABR_TAB_NAME).label + ' '
+          command += ' -x264opts keyint=300:min-keyint=1:ref=4:bframes=3:me=umh:scenecut=60:qcomp=0.5:psy-rd=0.3,0:aq-mode=2:aq-strength=0.8:cabac=1:interlaced=0:bitrate=' + dlg.control(ABR.ABR.name, ABR_TAB_NAME).value + ' '
+          command += ' -acodec aac '
+          command += ' -ab ' + dlg.control(ABR.BPS.name, ABR_TAB_NAME).value + ' '
+          command += ' -af aresample=async=1000 '
+          // command += ' -filter_complex ass="' + assPath + '":shaping=complex'
+          command += ' -metadata comment="Transcoded by FFMpeg" '
+          command += ' -f mp4 '
+          command += ' -movflags +faststart '
+          command += ' -max_muxing_queue_size 1024 '
+          if (subtitleInput) {
+            command += ' -filter_complex "subtitles=\\\'' + subtitleInput + '\\\'" '
+          }
+          command += ' -y "' + outputPath + '" '
+
+          DOpus.output("Run command:\n" + command)
+          clickData.func.command.runCommand(command)
+
         }
-        DOpus.output("Run command:\n" + command)
+
         dlg.endDlg()
       } else if (control == 'bt_close') {
         dlg.endDlg()
+      }
+    } else if (event == 'drop') {
+      if (control == INPUT || control == SUBTITLE) {
+        dlg.control(control, MAIN).value = msg.object[0].realpath
       }
     }
   }
@@ -181,15 +221,12 @@ function setupDefault (dlg, defaultObj, pName) {
       control.value = op.value
     } else if (type == 'select') {
       var subItems = op.options
-      var defaultIndex = 0
       for (var i = 0; i < subItems.length; i++) {
         var subItem = subItems[i]
         control.addItem(subItem)
-        if (subItem == op.value) {
-          defaultIndex = i
-        }
       }
       control.label = op.value
     }
   }
 }
+
