@@ -26,7 +26,7 @@ var CRF = {
   BPS: {
     name: 'CRF_BPS',
     type: 'text',
-    value: '192k',
+    value: '128k',
     options: []
   },
   PRESET: {
@@ -59,7 +59,7 @@ var ABR = {
   BPS: {
     name: 'ABR_BPS',
     type: 'text',
-    value: '192k',
+    value: '128k',
     options: []
   },
   PRESET: {

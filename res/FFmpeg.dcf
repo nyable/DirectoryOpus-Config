@@ -212,7 +212,7 @@
 			<instruction>  BPS: {</instruction>
 			<instruction>    name: &apos;CRF_BPS&apos;,</instruction>
 			<instruction>    type: &apos;text&apos;,</instruction>
-			<instruction>    value: &apos;192k&apos;,</instruction>
+			<instruction>    value: &apos;128k&apos;,</instruction>
 			<instruction>    options: []</instruction>
 			<instruction>  },</instruction>
 			<instruction>  PRESET: {</instruction>
@@ -245,7 +245,7 @@
 			<instruction>  BPS: {</instruction>
 			<instruction>    name: &apos;ABR_BPS&apos;,</instruction>
 			<instruction>    type: &apos;text&apos;,</instruction>
-			<instruction>    value: &apos;192k&apos;,</instruction>
+			<instruction>    value: &apos;128k&apos;,</instruction>
 			<instruction>    options: []</instruction>
 			<instruction>  },</instruction>
 			<instruction>  PRESET: {</instruction>
@@ -441,7 +441,7 @@
 			<instruction>			&lt;control case=&quot;lower&quot; halign=&quot;left&quot; height=&quot;12&quot; name=&quot;CRF_CRF&quot; title=&quot;23&quot; type=&quot;edit&quot; updown=&quot;yes&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;26&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static3&quot; title=&quot;音频比特率&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;46&quot; /&gt;</instruction>
 			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;CRF_VCODEC&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;8&quot; /&gt;</instruction>
-			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;CRF_BPS&quot; title=&quot;192k&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;44&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;CRF_BPS&quot; title=&quot;128k&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;44&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static4&quot; title=&quot;预设&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;64&quot; /&gt;</instruction>
 			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;CRF_PRESET&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;62&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static5&quot; title=&quot;输出路径&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;82&quot; /&gt;</instruction>
@@ -476,7 +476,7 @@
 			<instruction>				&lt;/contents&gt;</instruction>
 			<instruction>			&lt;/control&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static5&quot; title=&quot;输出路径&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;82&quot; /&gt;</instruction>
-			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_OUTPUT&quot; title=&quot;.&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;80&quot; /&gt;</instruction>
+			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_OUTPUT&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;80&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static1&quot; title=&quot;视频编码器&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;10&quot; /&gt;</instruction>
 			<instruction>		&lt;/dialog&gt;</instruction>
 			<instruction>	&lt;/resource&gt;</instruction>
