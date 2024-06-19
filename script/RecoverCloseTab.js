@@ -57,12 +57,12 @@ function OnRecoverTab (cmdData) {
   }
   if (Script.vars.Exists(CACHE_KEY)) {
     var value = Script.vars.Get(CACHE_KEY)
-    var len = value.length
-    if (len > 0) {
+    var cacheSize = value.length
+    if (cacheSize > 0) {
       if (index < 0) {
-        index = len - 1
-      } else if (index > len - 1) {
-        index = len - 1
+        index = cacheSize + index
+      } else if (index > cacheSize - 1) {
+        index = cacheSize - 1
       }
       var lastPath = value[index]
       var command = 'GO ' + lastPath + ' NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
@@ -73,6 +73,10 @@ function OnRecoverTab (cmdData) {
   }
 
 }
+
+
+
+
 /**
  * Called when a tab is closed
  * @param {DOpusCloseTabData} closeTabData 
