@@ -65,7 +65,7 @@ function OnRecoverTab (cmdData) {
         index = cacheSize - 1
       }
       var lastPath = value[index]
-      var command = 'GO ' + lastPath + ' NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
+      var command = 'GO "' + lastPath + '" NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
       DOpus.output('Run command: ' + command)
       cmd.runCommand(command)
       value.erase(index)
