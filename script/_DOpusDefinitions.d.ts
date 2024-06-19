@@ -5837,6 +5837,8 @@ interface DOpusScript extends DOpusVars {
    */
   readonly vars: DOpusVars;
 
+  Vars(key: string): DOpusVar;
+
   /**
    * Returns True if local HTTP help is enabled (that is, if help is shown in the user's web browser), False if the old HtmlHelp-style help is enabled. If HTTP help is enabled, your script is able to add its own help pages via the OnGetHelpContent event, and it can trigger the display of its own help pages using the ShowHelp method.
    */
@@ -7666,7 +7668,7 @@ interface DOpusVar extends String {
   /**
    * Returns True if the variable is persistent (saved) or False if not. You can set this property to change the persistence state.
    */
-  readonly persist: boolean;
+  persist: boolean;
 
   /**
    * Returns the value of the variable. You can set this property to change the value of the variable.You can store any type of variable in a Var object, although not all types can be saved to disk. If you want your variable to be persistent you should only use bool, int, string, date, currency or a Vector of those types.
@@ -7689,24 +7691,24 @@ interface DOpusVars extends DOpusVarWithoutDelete {
   /**
    * Deletes the named variable from the collection. You can also specify a wildcard pattern to delete multiple variables (or **\*** for all).
    */
-  delete(name: string): void;
+  Delete(name: string): void;
 
   /**
    * Returns True if the named variable exists in the collection, or False if it doesn't exist.
    */
-  exists(name: string): boolean;
+  Exists(name: string): boolean;
 
   /**
    * Returns the value of the named variable. You can use this method as an alternative to indexing the collection.
    */
-  get(name: string): any;
+  Get(name: string): any;
 
   /**
    * Sets the named value to the specified value. You can use this method as an alternative to indexing the collection.
    *
    * You can store any type of variable in a Vars collection, although not all types can be saved to disk. If you want your variable to be persistent you should only use bool, int, string, date, currency or a Vector of those types.
    */
-  set(name?: string, value?: any): void;
+  Set(name?: string, value?: any): void;
 }
 
 /**
