@@ -5,7 +5,9 @@
 
 
 
-## 命令
+## 命令脚本
+通过**脚本管理**进行添加的脚本。
+一般会增加命令或者对事件监听进行一定的操作。
 
 ### 自动解压 - [SmartExtract](/script/SmartExtract.js)  
 
@@ -27,6 +29,29 @@
 1. 解压单个文件`SmartExtract 压缩文件A的全路径`=>`SmartExtract C:/Users/nyable/Downloads/A.zip`
 2. 解压多个文件`SmartExtract 压缩文件A的全路径 压缩文件B的全路径`=>`SmartExtract C:/Users/nyable/Downloads/A.zip C:/Users/nyable/Downloads/B.zip`
 3. 解压选中的多个文件`SmartExtract {allfilepath$}`，可以自定义一个按钮,类型选择`标准功能(DOpus或外部程序)`，内容`SmartExtract {allfilepath$}`，选择压缩文件并点击按钮后，会解压所选的所有压缩文件。
+
+### 重新打开关闭的标签页 - [RecoverCloseTab](/script/RecoverCloseTab.js)  
+
+增加一个内部命令`RecoverTab`，用于重新打开关闭的标签页。可以通过`自定义-快捷键`设置快捷键触发。
+实际上只是重新打开关闭标签页的路径而已，并不会恢复各种布局状态等。且对关闭的窗口无效。
+虽然可以实现，但是要管理各种操作记录和布局状态，写的有点难受，暂时懒得做了。
+
+
+#### 额外依赖
+
+无
+
+#### eg
+`RecoverTab [关闭标签的index]?` 重新打开第index索引的标签。无参数则默认最新关闭的（RecoverTab -1）。
+
+脚本管理中的可配置项:
+  1. CONFIG_MAX_CACHE_SIZE:最大缓存数 默认:20
+  2. CONFIG_NO_FOCUS_RECOVERED_TAB:不聚焦到重新打开的标签页 默认:true
+  3. CACHE_PERSIST:是否持久化缓存 默认:false
+
+
+## 非命令脚本
+一般用于添加到自定义按钮之类的触发式执行。
 
 ### 调用 yt-dlp 下载视频 - [YtDlpInvoke](/script/YtDlpInvoke.js)
 
