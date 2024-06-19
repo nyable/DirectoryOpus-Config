@@ -1,4 +1,4 @@
-///<reference path="./_DOpusDefinitions.d.ts" />
+﻿///<reference path="./_DOpusDefinitions.d.ts" />
 //@ts-check
 // SmartExtract
 // (c) 2024 nyable
