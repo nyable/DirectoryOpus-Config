@@ -5,11 +5,18 @@
 
 // This is a script for Directory Opus.
 // See https://www.gpsoft.com.au/endpoints/redirect.php?page=scripts for development information.
-var CACHE_KEY = 'CLOSED_TAB_ARRAY'
+var CACHE_KEY = 'CLOSED_TAB_CACHE_LIST'
 
+// 操作的最大缓存数
 var CONFIG_MAX_CACHE_SIZE = 'MAX_CACHE_SIZE'
+// 不聚焦恢复的标签页
 var CONFIG_NO_FOCUS_RECOVERED_TAB = 'NO_FOCUS_RECOVERED_TAB'
+// 持久化缓存
 var CONFIG_CACHE_PERSIST = 'CACHE_PERSIST'
+// 是否缓存窗口关闭
+var CONFIG_ENABLE_LISTER_CACHE = 'ENABLE_LISTER_CACHE'
+// 当CONFIG_ENABLE_LISTER_CACHE启用时,关闭的窗口中标签页最少需要多少个才进行缓存
+var CONFIG_MIN_SIZE_LISTER_CACHE_START = 'MIN_SIZE_LISTER_CACHE_START'
 /**
  * 
  * 
@@ -24,7 +31,7 @@ function OnInit (initData) {
   initData.version = "1.0"
   initData.copyright = "(c) 2024 nyable"
   //	initData.url = "https://resource.dopus.com/c/buttons-scripts/16";
-  initData.desc = "Recover closed tab"
+  initData.desc = "ReOpen closed tab or lister"
   initData.default_enable = true
   initData.min_version = "13.0"
 
@@ -39,6 +46,17 @@ function OnInit (initData) {
   initData.config[CONFIG_MAX_CACHE_SIZE] = 20
   initData.config[CONFIG_NO_FOCUS_RECOVERED_TAB] = true
   initData.config[CONFIG_CACHE_PERSIST] = false
+  initData.config[CONFIG_ENABLE_LISTER_CACHE] = false
+  initData.config[CONFIG_MIN_SIZE_LISTER_CACHE_START] = 2
+
+  var configDescMap = DOpus.create().map()
+  configDescMap.set(CONFIG_MAX_CACHE_SIZE, '最大缓存数')
+  configDescMap.set(CONFIG_NO_FOCUS_RECOVERED_TAB, '不聚焦恢复的标签页')
+  configDescMap.set(CONFIG_CACHE_PERSIST, '缓存持久化')
+  configDescMap.set(CONFIG_ENABLE_LISTER_CACHE, '是否缓存关闭的窗口')
+  configDescMap.set(CONFIG_MIN_SIZE_LISTER_CACHE_START, '缓存窗口所需最少标签页数量')
+
+  initData.config_desc = configDescMap
 
 }
 
@@ -64,11 +82,39 @@ function OnRecoverTab (cmdData) {
       } else if (index > cacheSize - 1) {
         index = cacheSize - 1
       }
-      var lastPath = value[index]
-      var command = 'GO "' + lastPath + '" NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
-      DOpus.output('Run command: ' + command)
-      cmd.runCommand(command)
+      var lastCache = value[index]
       value.erase(index)
+      if (lastCache) {
+        DOpus.output('lastPath: ' + lastCache)
+        var item = JSON.parse(lastCache)
+        var paths = item.paths
+        var actionType = item.type
+        if (actionType == 'tab') {
+          for (var i = 0; i < paths.length; i++) {
+            var path = paths[i]
+            var command = 'GO "' + path + '" NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
+            DOpus.output('[tab]Run command: ' + command)
+            cmd.runCommand(command)
+          }
+        } else if (actionType == 'lister') {
+          for (var i = 0; i < paths.length; i++) {
+            var path = paths[i]
+            var multiCmd = DOpus.create().command()
+
+            if (i == 0) {
+              var listerCmd = 'GO "' + path + '" NEW EXISTINGLISTER'
+              DOpus.output('[lister]Begin command: ' + listerCmd)
+              multiCmd.addLine(listerCmd)
+            } else {
+              var tabCmd = 'GO "' + path + '" NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
+              DOpus.output('[lister]Tab command: ' + tabCmd)
+              multiCmd.addLine(tabCmd)
+            }
+            multiCmd.run()
+          }
+        }
+      }
+
     }
   }
 
@@ -90,10 +136,52 @@ function OnCloseTab (closeTabData) {
   if (value.length >= Script.config[CONFIG_MAX_CACHE_SIZE]) {
     value.erase(0)
   }
-  value.push_back(tabPath)
+
+  value.push_back(JSON.stringify(
+    {
+      type: 'tab',
+      paths: [tabPath],
+      time: new Date().getTime()
+    }
+  ))
+
   if (Script.vars.Exists(CACHE_KEY)) {
     Script.vars.Set(CACHE_KEY, value)
     Script.Vars(CACHE_KEY).persist = Script.config[CONFIG_CACHE_PERSIST]
+  }
+}
+/**
+ * Called when a lister is closed
+ * @param {DOpusCloseListerData} closeListerData 
+ */
+function OnCloseLister (closeListerData) {
+  if (Script.config[CONFIG_ENABLE_LISTER_CACHE]) {
+    if (!Script.vars.Exists(CACHE_KEY)) {
+      Script.vars.Set(CACHE_KEY, DOpus.create().vector())
+    }
+    var tabs = closeListerData.lister.tabs
+    // @ts-ignore
+    var count = tabs.count
+    if (Script.vars.Exists(CACHE_KEY) && tabs && count >= Script.config[CONFIG_MIN_SIZE_LISTER_CACHE_START]) {
+      var value = Script.vars.Get(CACHE_KEY)
+      if (value.length >= Script.config[CONFIG_MAX_CACHE_SIZE]) {
+        value.erase(0)
+      }
+      var paths = []
+      for (var i = 0; i < count; i++) {
+        paths[i] = String(tabs[i].crumbpath)
+      }
+      value.push_back(JSON.stringify(
+        {
+          type: 'lister',
+          paths: paths,
+          time: new Date().getTime()
+        }
+      ))
+
+      Script.vars.Set(CACHE_KEY, value)
+      Script.Vars(CACHE_KEY).persist = Script.config[CONFIG_CACHE_PERSIST]
+    }
   }
 }
 
