@@ -132,7 +132,7 @@ function OnCloseTab (closeTabData) {
     Script.vars.Set(CACHE_KEY, DOpus.create().vector())
   }
   var value = Script.vars.Get(CACHE_KEY)
-  var tabPath = String(closeTabData.tab.crumbpath)
+  var tabPath = String(closeTabData.tab.path)
   if (value.length >= Script.config[CONFIG_MAX_CACHE_SIZE]) {
     value.erase(0)
   }
@@ -169,7 +169,7 @@ function OnCloseLister (closeListerData) {
       }
       var paths = []
       for (var i = 0; i < count; i++) {
-        paths[i] = String(tabs[i].crumbpath)
+        paths[i] = String(tabs[i].path)
       }
       value.push_back(JSON.stringify(
         {
