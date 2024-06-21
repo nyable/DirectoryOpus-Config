@@ -42,6 +42,11 @@ function OnInit (initData) {
   cmd.label = "RecoverTab"
   cmd.template = "INDEX/N"
 
+  var clearCMD = initData.addCommand()
+  clearCMD.name = 'ClearRecoverTabCache'
+  clearCMD.method = 'OnClearRecoverTabCache'
+  clearCMD.desc = 'ClearRecoverTabCache'
+  clearCMD.label = 'ClearRecoverTabCache'
 
   initData.config[CONFIG_MAX_CACHE_SIZE] = 20
   initData.config[CONFIG_NO_FOCUS_RECOVERED_TAB] = true
@@ -63,7 +68,6 @@ function OnInit (initData) {
 /**
  * 
  * @param {DOpusScriptCommandData} cmdData 
- * @returns 
  */
 function OnRecoverTab (cmdData) {
 
@@ -120,6 +124,16 @@ function OnRecoverTab (cmdData) {
 
 }
 
+
+/**
+ * 
+ * @param {DOpusScriptCommandData} cmdData 
+ */
+function OnClearRecoverTabCache (cmdData) {
+  if (Script.vars.Exists(CACHE_KEY)) {
+    Script.vars.Delete(CACHE_KEY)
+  }
+}
 
 
 
