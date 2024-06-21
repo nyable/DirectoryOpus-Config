@@ -28,9 +28,9 @@ var CONFIG_MIN_SIZE_LISTER_CACHE_START = 'MIN_SIZE_LISTER_CACHE_START'
  */
 function OnInit (initData) {
   initData.name = "RecoverCloseTab"
-  initData.version = "1.0"
+  initData.version = "1.1"
   initData.copyright = "(c) 2024 nyable"
-  //	initData.url = "https://resource.dopus.com/c/buttons-scripts/16";
+  initData.url = "https://github.com/nyable/DirectoryOpus-Config/blob/main/script/RecoverCloseTab.js"
   initData.desc = "ReOpen closed tab or lister"
   initData.default_enable = true
   initData.min_version = "13.0"
@@ -47,6 +47,12 @@ function OnInit (initData) {
   clearCMD.method = 'OnClearRecoverTabCache'
   clearCMD.desc = 'ClearRecoverTabCache'
   clearCMD.label = 'ClearRecoverTabCache'
+
+  var guiCMD = initData.addCommand()
+  guiCMD.name = 'OpenRecoverTabManager'
+  guiCMD.method = 'OnOpenRecoverTabManager'
+  guiCMD.desc = 'OpenRecoverTabManager'
+  guiCMD.label = 'OpenRecoverTabManager'
 
   initData.config[CONFIG_MAX_CACHE_SIZE] = 20
   initData.config[CONFIG_NO_FOCUS_RECOVERED_TAB] = true
@@ -66,7 +72,7 @@ function OnInit (initData) {
 }
 
 /**
- * 
+ * 恢复标签页
  * @param {DOpusScriptCommandData} cmdData 
  */
 function OnRecoverTab (cmdData) {
@@ -126,14 +132,52 @@ function OnRecoverTab (cmdData) {
 
 
 /**
- * 
+ * 清除所有缓存
  * @param {DOpusScriptCommandData} cmdData 
  */
 function OnClearRecoverTabCache (cmdData) {
-  if (Script.vars.Exists(CACHE_KEY)) {
-    Script.vars.Delete(CACHE_KEY)
-  }
+  clearAllTabCache()
 }
+
+
+
+/**
+ * 打开缓存管理器
+ * @param {DOpusScriptCommandData} cmdData 
+ */
+function OnOpenRecoverTabManager (cmdData) {
+
+  if (Script.vars.Exists(CACHE_KEY)) {
+    var dlg = cmdData.func.dlg()
+    dlg.message = '缓存列表'
+    dlg.title = '标签缓存管理器'
+    dlg.buttons = '全部清除|取消'
+    var value = Script.vars.Get(CACHE_KEY)
+    var choices = []
+    for (var i = 0; i < value.length; i++) {
+      var item = JSON.parse(value[i])
+      var type = item.type
+      var text = type == 'lister' ? ('With ' + item.paths.length + ' tabs') : item.paths[0]
+
+      var time = DOpus.create().date()
+      time.setTime(item.time)
+      choices.push('[' + type.toUpperCase() + '] ' + text + ' at ' + time.format('D#yyyy-MM-dd T#HH:mm:ss'))
+    }
+    dlg.choices = choices
+    dlg.list = 0
+    dlg.sort = false
+    dlg.detach = false
+    var result = dlg.show()
+    if (result == 1) {
+      clearAllTabCache()
+    }
+  } else {
+    DOpus.output('缓存列表为空')
+  }
+
+}
+
+
 
 
 
@@ -200,4 +244,11 @@ function OnCloseLister (closeListerData) {
 }
 
 
-
+/**
+ * 清除所有缓存
+ */
+function clearAllTabCache () {
+  if (Script.vars.Exists(CACHE_KEY)) {
+    Script.vars.Delete(CACHE_KEY)
+  }
+}

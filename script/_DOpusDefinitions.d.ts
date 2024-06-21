@@ -1572,7 +1572,7 @@ interface DOpusDialog {
   /**
    * In a drop-down list dialog (one with the choices property set without either list or menu), this property returns the index of the item chosen from the drop-down list after the Show method returns.
    */
-  readonly selection: number;
+  selection: number;
 
   /**
    * Set this property to True if the list of choices given by the choices property should be sorted alphabetically.
