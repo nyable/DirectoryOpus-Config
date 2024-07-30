@@ -107,20 +107,25 @@ function OnRecoverTab (cmdData) {
             cmd.runCommand(command)
           }
         } else if (actionType == 'lister') {
-          for (var i = 0; i < paths.length; i++) {
-            var path = paths[i]
-            var multiCmd = DOpus.create().command()
-
-            if (i == 0) {
-              var listerCmd = 'GO "' + path + '" NEW EXISTINGLISTER'
-              DOpus.output('[lister]Begin command: ' + listerCmd)
-              multiCmd.addLine(listerCmd)
-            } else {
-              var tabCmd = 'GO "' + path + '" NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
-              DOpus.output('[lister]Tab command: ' + tabCmd)
-              multiCmd.addLine(tabCmd)
+          if(DOpus.version.atLeast('13.9.2.0')){
+            // 用13.9.2.0开始有的重新打开上次关闭的列表器的命令
+            DOpus.create().command().runCommand('Go UNDOCLOSELISTER')
+          }else{
+            for (var i = 0; i < paths.length; i++) {
+              var path = paths[i]
+              var multiCmd = DOpus.create().command()
+  
+              if (i == 0) {
+                var listerCmd = 'GO "' + path + '" NEW EXISTINGLISTER'
+                DOpus.output('[lister]Begin command: ' + listerCmd)
+                multiCmd.addLine(listerCmd)
+              } else {
+                var tabCmd = 'GO "' + path + '" NEWTAB=' + (Script.config[CONFIG_NO_FOCUS_RECOVERED_TAB] ? 'nofocus' : 'default')
+                DOpus.output('[lister]Tab command: ' + tabCmd)
+                multiCmd.addLine(tabCmd)
+              }
+              multiCmd.run()
             }
-            multiCmd.run()
           }
         }
       }
