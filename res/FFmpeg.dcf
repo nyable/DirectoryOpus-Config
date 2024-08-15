@@ -453,28 +453,10 @@
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static2&quot; title=&quot;ABR&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;28&quot; /&gt;</instruction>
 			<instruction>			&lt;control case=&quot;lower&quot; halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_ABR&quot; number=&quot;yes&quot; title=&quot;2400&quot; type=&quot;edit&quot; updown=&quot;yes&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;26&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static3&quot; title=&quot;音频比特率&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;46&quot; /&gt;</instruction>
-			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;ABR_VCODEC&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;8&quot;&gt;</instruction>
-			<instruction>				&lt;contents&gt;</instruction>
-			<instruction>					&lt;item text=&quot;libx264&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;libx265&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;mpeg4&quot; /&gt;</instruction>
-			<instruction>				&lt;/contents&gt;</instruction>
-			<instruction>			&lt;/control&gt;</instruction>
+			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;ABR_VCODEC&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;8&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_BPS&quot; title=&quot;128k&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;44&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static4&quot; title=&quot;预设&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;64&quot; /&gt;</instruction>
-			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;ABR_PRESET&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;62&quot;&gt;</instruction>
-			<instruction>				&lt;contents&gt;</instruction>
-			<instruction>					&lt;item text=&quot;ultrafast&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;superfast&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;veryfast&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;faster&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;fast&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;medium&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;slow&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;slower&quot; /&gt;</instruction>
-			<instruction>					&lt;item text=&quot;veryslow&quot; /&gt;</instruction>
-			<instruction>				&lt;/contents&gt;</instruction>
-			<instruction>			&lt;/control&gt;</instruction>
+			<instruction>			&lt;control edit=&quot;yes&quot; height=&quot;40&quot; max=&quot;50&quot; name=&quot;ABR_PRESET&quot; type=&quot;combo&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;62&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static5&quot; title=&quot;输出路径&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;82&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;ABR_OUTPUT&quot; type=&quot;edit&quot; width=&quot;64&quot; x=&quot;58&quot; y=&quot;80&quot; /&gt;</instruction>
 			<instruction>			&lt;control halign=&quot;left&quot; height=&quot;8&quot; name=&quot;static1&quot; title=&quot;视频编码器&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;36&quot; x=&quot;12&quot; y=&quot;10&quot; /&gt;</instruction>

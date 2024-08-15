@@ -3781,7 +3781,7 @@ interface DOpusFSUtil {
    */
   hash(
     pathOrBlob?: string | DOpusBlob,
-    type?: keyof typeof DOpusFSUtilHashAlgorithms
+    type?: String | keyof typeof DOpusFSUtilHashAlgorithms
   ): string | DOpusVector<any>;
 
   /**
