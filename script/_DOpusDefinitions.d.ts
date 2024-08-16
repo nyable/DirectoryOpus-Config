@@ -982,7 +982,7 @@ interface DOpusControl {
    *
    * Currently only static text and list view controls are supported for this property.
    */
-  readonly bg: string;
+  bg: string;
 
   /**
    * For a list view control, returns a DialogListColumns object that lets you query or modify the columns in Details mode.
@@ -1007,14 +1007,14 @@ interface DOpusControl {
   /**
    * Set or query the enabled state of the control. Returns True if the control is enabled, False if it's disabled. You can set this property to change the state.
    */
-  readonly enabled: boolean;
+  enabled: boolean;
 
   /**
    * Set or query the color used for the text (foreground) of this control. This is in the format #RRGGBB (hexadecimal) or RRR,GGG,BBB (decimal).
    *
    * Currently only static text and list view controls are supported for this property.
    */
-  readonly fg: string;
+  fg: string;
 
   /**
    * Set or query the input focus state of the control. Returns True if the control currently has input focus, False if it doesn't. Set to True to give the control input focus.
@@ -1055,7 +1055,7 @@ interface DOpusControl {
    *
    * Currently only list view controls are supported for this property.
    */
-  readonly textbg: string;
+  textbg: string;
 
   /**
    * Set or query the control's value. The meaning of this property depends on the type of the control:

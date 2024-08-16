@@ -34,6 +34,19 @@
 
 在自定义模式下把 dcf 文件拖入想要放置的位置即可
 
+### 对比和计算文件的 Hash 值
+
+调用内置的`DOpus.fsUtil().hash`方法计算文件的 Hash 值。  
+支持的算法`['md5', 'sha1', 'sha256', 'sha512', 'blake3', 'crc32']`。
+
+标签页 1 Compare 的功能是比较输入 hash 值和文件的实际 hash 值是否一致，会根据输入 hash 值长度的不同，选取 hash 算法进行计算然后比对。  
+标签页 2 Hash 的功能是根据勾选的算法计算文件的 hash 值。默认勾选的配置在脚本文件的变量`types`中根据`checked`判断。
+
+[按钮](Hash%20Compare.dcf)
+[维护脚本](script/FileHashCompare.js)
+
+在自定义模式下把 dcf 文件拖入想要放置的位置即可
+
 ## 主题 - Themes
 
 无
