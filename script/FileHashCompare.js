@@ -122,7 +122,7 @@ function OnClick (clickData) {
         DOpus.setClip(dlg.control(copyType, LT_TAB2).value)
       } else if (control == LT_BT_COMPARE) {
         if (DOpus.fsUtil().exists(path)) {
-          var compareValue = dlg.control(LT_TEXT_COMPARE, LT_TAB1).value
+          var compareValue = String(dlg.control(LT_TEXT_COMPARE, LT_TAB1).value).toLowerCase()
           var ms = []
           var inputSize = compareValue.length
           for (var i = 0; i < types.length; i++) {
@@ -139,7 +139,7 @@ function OnClick (clickData) {
             var hashResult = DOpus.fsUtil().hash(path, ms.join(','))
             waiting(dlg, false)
             if (typeof hashResult == 'string') {
-              if (compareValue == hashResult) {
+              if (compareValue == hashResult.toLowerCase()) {
                 setResult(dlg, '匹配算法: ' + ms[0], true)
               } else {
                 setResult(dlg, '不匹配算法: ' + ms[0] + '\r\n实际值为: \r\n' + hashResult, false)
@@ -149,7 +149,7 @@ function OnClick (clickData) {
               for (var i = 0; i < hashResult.length; i++) {
                 var hash = hashResult[i]
                 results[results.length] = ms[i] + ": " + hash
-                if (hash.toLowerCase() == compareValue.toLowerCase()) {
+                if (compareValue == hash.toLowerCase()) {
                   setResult(dlg, '匹配算法:' + ms[i], true)
                   break
                 }

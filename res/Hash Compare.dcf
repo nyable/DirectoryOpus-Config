@@ -51,7 +51,7 @@
 		<instruction>var LT_TEXT_RESULT = &apos;text_result&apos;</instruction>
 		<instruction>var LT_TEXT_COLOR = &apos;text_color&apos;</instruction>
 		<instruction>/**</instruction>
-		<instruction> * 点击时弹出对话框</instruction>
+		<instruction> * 进行Hash对比或计算</instruction>
 		<instruction> * @param {DOpusClickData} clickData </instruction>
 		<instruction> */</instruction>
 		<instruction>function OnClick (clickData) {</instruction>
@@ -128,7 +128,7 @@
 		<instruction>        DOpus.setClip(dlg.control(copyType, LT_TAB2).value)</instruction>
 		<instruction>      } else if (control == LT_BT_COMPARE) {</instruction>
 		<instruction>        if (DOpus.fsUtil().exists(path)) {</instruction>
-		<instruction>          var compareValue = dlg.control(LT_TEXT_COMPARE, LT_TAB1).value</instruction>
+		<instruction>          var compareValue = String(dlg.control(LT_TEXT_COMPARE, LT_TAB1).value).toLowerCase()</instruction>
 		<instruction>          var ms = []</instruction>
 		<instruction>          var inputSize = compareValue.length</instruction>
 		<instruction>          for (var i = 0; i &lt; types.length; i++) {</instruction>
@@ -145,7 +145,7 @@
 		<instruction>            var hashResult = DOpus.fsUtil().hash(path, ms.join(&apos;,&apos;))</instruction>
 		<instruction>            waiting(dlg, false)</instruction>
 		<instruction>            if (typeof hashResult == &apos;string&apos;) {</instruction>
-		<instruction>              if (compareValue == hashResult) {</instruction>
+		<instruction>              if (compareValue == hashResult.toLowerCase()) {</instruction>
 		<instruction>                setResult(dlg, &apos;匹配算法: &apos; + ms[0], true)</instruction>
 		<instruction>              } else {</instruction>
 		<instruction>                setResult(dlg, &apos;不匹配算法: &apos; + ms[0] + &apos;\r\n实际值为: \r\n&apos; + hashResult, false)</instruction>
@@ -155,7 +155,7 @@
 		<instruction>              for (var i = 0; i &lt; hashResult.length; i++) {</instruction>
 		<instruction>                var hash = hashResult[i]</instruction>
 		<instruction>                results[results.length] = ms[i] + &quot;: &quot; + hash</instruction>
-		<instruction>                if (hash.toLowerCase() == compareValue.toLowerCase()) {</instruction>
+		<instruction>                if (compareValue == hash.toLowerCase()) {</instruction>
 		<instruction>                  setResult(dlg, &apos;匹配算法:&apos; + ms[i], true)</instruction>
 		<instruction>                  break</instruction>
 		<instruction>                }</instruction>
@@ -201,7 +201,7 @@
 		<instruction>  dlg.control(LT_BT_COMPARE, LT_TAB1).enabled = !waiting</instruction>
 		<instruction>  dlg.control(LT_BT_HASH, LT_TAB2).enabled = !waiting</instruction>
 		<instruction>  dlg.control(LT_BT_CLEAR, LT_TAB2).enabled = !waiting</instruction>
-		<instruction>  dlg.control(LT_TEXT_TIPS, LT_MAIN).label = waiting ? &apos;加载中...&apos; : &apos;&apos;</instruction>
+		<instruction>  dlg.control(LT_TEXT_TIPS, LT_MAIN).label = waiting ? &apos;计算中...&apos; : &apos;&apos;</instruction>
 		<instruction>}</instruction>
 		<instruction />
 		<instruction>/**</instruction>
@@ -240,8 +240,8 @@
 		<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;static2&quot; title=&quot;Hash&quot; type=&quot;static&quot; valign=&quot;center&quot; width=&quot;30&quot; x=&quot;8&quot; y=&quot;6&quot; /&gt;</instruction>
 		<instruction>			&lt;control height=&quot;14&quot; name=&quot;bt_compare&quot; title=&quot;比较&quot; type=&quot;button&quot; width=&quot;50&quot; x=&quot;84&quot; y=&quot;120&quot; /&gt;</instruction>
 		<instruction>			&lt;control halign=&quot;left&quot; height=&quot;12&quot; name=&quot;static3&quot; title=&quot;Result&quot; type=&quot;static&quot; valign=&quot;center&quot; width=&quot;30&quot; x=&quot;8&quot; y=&quot;24&quot; /&gt;</instruction>
-		<instruction>			&lt;control halign=&quot;left&quot; height=&quot;78&quot; multiline=&quot;yes&quot; name=&quot;text_result&quot; type=&quot;edit&quot; width=&quot;166&quot; x=&quot;44&quot; y=&quot;24&quot; /&gt;</instruction>
-		<instruction>			&lt;control halign=&quot;left&quot; height=&quot;6&quot; name=&quot;text_color&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;166&quot; x=&quot;42&quot; y=&quot;102&quot; /&gt;</instruction>
+		<instruction>			&lt;control halign=&quot;left&quot; height=&quot;78&quot; multiline=&quot;yes&quot; name=&quot;text_result&quot; type=&quot;edit&quot; width=&quot;168&quot; x=&quot;44&quot; y=&quot;24&quot; /&gt;</instruction>
+		<instruction>			&lt;control halign=&quot;left&quot; height=&quot;6&quot; name=&quot;text_color&quot; type=&quot;static&quot; valign=&quot;top&quot; width=&quot;168&quot; x=&quot;44&quot; y=&quot;102&quot; /&gt;</instruction>
 		<instruction>		&lt;/dialog&gt;</instruction>
 		<instruction>	&lt;/resource&gt;</instruction>
 		<instruction>	&lt;resource name=&quot;tab2&quot; type=&quot;dialog&quot;&gt;</instruction>
