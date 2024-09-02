@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<button backcol="none" display="both" icon_size="large" label_pos="bottom" textcol="none">
+	<label>清空回收站</label>
+	<icon1>/system/SHELL32.dll,32</icon1>
+	<function type="normal">
+		<instruction>@icon:/system/SHELL32.dll#31,RECYCLEBINEMPTY</instruction>
+		<instruction>@confirm:确认要清空回收站吗?|是|否</instruction>
+		<instruction>Delete EMPTYRECYCLE FORCE</instruction>
+	</function>
+</button>

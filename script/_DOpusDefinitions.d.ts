@@ -983,7 +983,7 @@ interface DOpusControl {
    * Currently only static text and list view controls are supported for this property.
    */
   bg: string;
-
+  title: string;
   /**
    * For a list view control, returns a DialogListColumns object that lets you query or modify the columns in Details mode.
    */
@@ -1084,6 +1084,8 @@ interface DOpusControl {
    * Set or query the top (y) position of the control, in pixels.
    */
   readonly y: number;
+
+  image: string;
 
   /**
    * Adds a new group to a list view control. Items you add to the list can optionally be placed in groups. Each group must have a unique ID.
@@ -1620,7 +1622,7 @@ interface DOpusDialog {
    * Specifies the y-position of a script dialog. Use the position property to control how the position is interpreted. After the dialog has been displayed you can change this property to move the dialog around on-screen.
    */
   y: number;
-
+  newHTTPReq(): any;
   /**
    * Creates a hotkey (or keyboard accelerator) for the specified key combination. When the user presses this key combination in your dialog, a hotkey event will be triggered.
    *
