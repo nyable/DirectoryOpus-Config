@@ -40,7 +40,7 @@ function OnInit(initData) {
 
 
 
-  initData.config[CONFIG_IGNORE_DIR_NAME] = true
+  initData.config[CONFIG_IGNORE_DIR_NAME] = false
 
   var configDescMap = DOpus.create().map()
   configDescMap.set(CONFIG_IGNORE_DIR_NAME, '是否开启强制取消嵌套(对根文件夹进行重命名和移动)')
