@@ -16,9 +16,13 @@
 * 其他情况均解压到与压缩文件同名的文件夹内
 * 如果已经存在同名文件夹,则会提示是否覆盖,而不会重命名文件夹
  */
-
+/**
+ * 是否开启强制取消嵌套(对根文件夹进行重命名和移动)
+ * 
+ */
+var CONFIG_IGNORE_DIR_NAME = 'CONFIG_IGNORE_DIR_NAME'
 // Called by Directory Opus to initialize the script
-function OnInit (initData) {
+function OnInit(initData) {
   initData.name = "SmartExtract"
   initData.version = "1.0"
   initData.copyright = "(c) 2024 nyable"
@@ -35,9 +39,17 @@ function OnInit (initData) {
   cmd.template = "SOURCE/M"
 
 
+
+  initData.config[CONFIG_IGNORE_DIR_NAME] = true
+
+  var configDescMap = DOpus.create().map()
+  configDescMap.set(CONFIG_IGNORE_DIR_NAME, '是否开启强制取消嵌套(对根文件夹进行重命名和移动)')
+
+  initData.config_desc = configDescMap
+
 }
 
-function OnSmartExtract (cmdData) {
+function OnSmartExtract(cmdData) {
   var args = cmdData.func.args
   var cmd = cmdData.func.command
   if (!args.got_arg.source) {
@@ -73,10 +85,21 @@ function OnSmartExtract (cmdData) {
           var fileCount = innerRootFiles.count
           if (fileCount == 1) {
             var firstFile = innerRootFiles[0]
-            if (firstFile.is_dir && firstFile.name == fileNameStem) {
+            if (firstFile.is_dir) {
               var firstRealPath = firstFile.RealPath
-              cmd.RunCommand('COPY MOVE ' + wrapPath(firstRealPath) + ' TO ' + wrapPath(fileParentPath))
-              DOpus.output("将目录: " + firstRealPath + " 移动至 " + fileParentPath)
+              var innerDirName = firstFile.name
+              var ignoreDirName = Script.config[CONFIG_IGNORE_DIR_NAME]
+              if (ignoreDirName) {
+                var renameCmd = 'RENAME FROM ' + wrapPath(firstRealPath) + ' TO ' + wrapPath(fileNameStem) + ' TYPE=dirs'
+                DOpus.output("解压时忽略名称对比,执行重命名命令: " + renameCmd)
+                cmd.RunCommand(renameCmd)
+                innerDirName = fileNameStem
+              }
+              if (innerDirName == fileNameStem) {
+                var sourcePath = wrapPath(fileParentPath + '\\' + innerDirName + '\\' + innerDirName)
+                cmd.RunCommand('COPY MOVE ' + sourcePath + ' TO ' + wrapPath(fileParentPath))
+                DOpus.output("将目录: " + sourcePath + " 移动至 " + fileParentPath)
+              }
             }
           }
           break
@@ -94,7 +117,7 @@ function OnSmartExtract (cmdData) {
 
 }
 
-function wrapPath (path) {
+function wrapPath(path) {
   if (path) {
     return '"' + path + '"'
   }
