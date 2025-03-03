@@ -1,37 +1,43 @@
 # 资源
 
 ## 图标 - Icons
+
 图标的来源见说明，按照个人喜好去掉或拆分了部分图标。
 对图标本身仅做了格式转换和打包处理。  
-使用方法：下载dis文件，然后在`设置-选项-工具栏-图标`页面中使用`导入`。  
+使用方法：下载 dis 文件，然后在`设置-选项-工具栏-图标`页面中使用`导入`。  
 预览图见图标来源仓库，或者下载后导入预览。
+
 ### 仪表盘图标 - dashboard-icons(1537)
 
 超过 1500 个仪表盘图标  
 [dashboard-icons](icons/Dashboard%20Icons%20v93ab09f.dis)  
-来源: https://github.com/walkxcode/dashboard-icons  
+来源: https://github.com/walkxcode/dashboard-icons
 
 ### Reversal-icon-theme
 
-[Reversal-colorful-folder](icons/Reversal-colorful-folder.dis) 180个文件夹图标  
-[Reversal-icon-theme](icons/Reversal-icon-theme.dis) 248个各种图标  
-来源: https://github.com/yeyushengfan258/Reversal-icon-theme  
+[Reversal-colorful-folder](icons/Reversal-colorful-folder.dis) 180 个文件夹图标  
+[Reversal-icon-theme](icons/Reversal-icon-theme.dis) 248 个各种图标  
+来源: https://github.com/yeyushengfan258/Reversal-icon-theme
 
 ### Tela-icon-theme
-[Tela-icon-theme](icons/Tela-icon-theme.dis) 1394个各种图标  
+
+[Tela-icon-theme](icons/Tela-icon-theme.dis) 1394 个各种图标  
 来源: https://github.com/vinceliuice/Tela-icon-theme
 
 ### McMojave-circle
-[McMojave-circle](icons/McMojave-circle.dis) 1370个各种图标  
-[McMojave-circle](icons/McMojave-colorful-folder.dis) 180个文件夹图标  
-来源: https://github.com/vinceliuice/McMojave-circle  
+
+[McMojave-circle](icons/McMojave-circle.dis) 1370 个各种图标  
+[McMojave-colorful-folder](icons/McMojave-colorful-folder.dis) 180 个文件夹图标  
+来源: https://github.com/vinceliuice/McMojave-circle
 
 ### Qogir-theme
-[Qogir-theme](icons/Qogir-icon-theme.dis) 1397个各种图标  
-来源: https://github.com/vinceliuice/Qogir-theme  
+
+[Qogir-theme](icons/Qogir-icon-theme.dis) 1397 个各种图标  
+来源: https://github.com/vinceliuice/Qogir-theme
 
 ### Uos-fulldistro-icons
-[Uos-fulldistro-icons](icons/Uos-fulldistro-icons.dis) 2937个各种图标  
+
+[Uos-fulldistro-icons](icons/Uos-fulldistro-icons.dis) 2937 个各种图标  
 来源: https://github.com/zayronxio/Uos-fulldistro-icons
 
 ## 按钮 - Buttons
