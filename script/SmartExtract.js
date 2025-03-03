@@ -20,7 +20,7 @@
  * 是否开启强制取消嵌套(对根文件夹进行重命名和移动)
  * 
  */
-var CONFIG_IGNORE_DIR_NAME = 'CONFIG_IGNORE_DIR_NAME'
+var CONFIG_FORCE_UNNEST = 'CONFIG_FORCE_UNNEST'
 // Called by Directory Opus to initialize the script
 function OnInit(initData) {
   initData.name = "SmartExtract"
@@ -40,10 +40,10 @@ function OnInit(initData) {
 
 
 
-  initData.config[CONFIG_IGNORE_DIR_NAME] = false
+  initData.config[CONFIG_FORCE_UNNEST] = false
 
   var configDescMap = DOpus.create().map()
-  configDescMap.set(CONFIG_IGNORE_DIR_NAME, '是否开启强制取消嵌套(对根文件夹进行重命名和移动)')
+  configDescMap.set(CONFIG_FORCE_UNNEST, '是否开启强制取消嵌套(对根文件夹进行重命名和移动)')
 
   initData.config_desc = configDescMap
 
@@ -53,7 +53,7 @@ function OnSmartExtract(cmdData) {
   var args = cmdData.func.args
   var cmd = cmdData.func.command
   if (!args.got_arg.source) {
-    DOpus.output('Need select a zip file as source', true)
+    DOpus.output('需要选择至少一个压缩文件！', true)
     return
   }
   var targetList = args.source
@@ -88,17 +88,19 @@ function OnSmartExtract(cmdData) {
             if (firstFile.is_dir) {
               var firstRealPath = firstFile.RealPath
               var innerDirName = firstFile.name
-              var ignoreDirName = Script.config[CONFIG_IGNORE_DIR_NAME]
-              if (ignoreDirName) {
+              var forceUnnest = Script.config[CONFIG_FORCE_UNNEST]
+              if (forceUnnest) {
+                // 开启强制取消嵌套时,把内部目录重命名为压缩包的名称,这样后面移动的时候就会取消嵌套
                 var renameCmd = 'RENAME FROM ' + wrapPath(firstRealPath) + ' TO ' + wrapPath(fileNameStem) + ' TYPE=dirs'
-                DOpus.output("解压时忽略名称对比,执行重命名命令: " + renameCmd)
+                DOpus.output("开启强制取消嵌套,执行重命名命令: " + renameCmd)
                 cmd.RunCommand(renameCmd)
                 innerDirName = fileNameStem
               }
               if (innerDirName == fileNameStem) {
                 var sourcePath = wrapPath(fileParentPath + '\\' + innerDirName + '\\' + innerDirName)
-                cmd.RunCommand('COPY MOVE ' + sourcePath + ' TO ' + wrapPath(fileParentPath))
-                DOpus.output("将目录: " + sourcePath + " 移动至 " + fileParentPath)
+                var moveCmd = 'COPY MOVE ' + sourcePath + ' TO ' + wrapPath(fileParentPath)
+                cmd.RunCommand(moveCmd)
+                DOpus.output("将目录: " + sourcePath + " 移动至 " + fileParentPath + " :" + moveCmd)
               }
             }
           }
