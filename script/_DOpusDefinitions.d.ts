@@ -205,11 +205,11 @@ interface DOpusArgs {
    * If an argument was not provided on the command line by the user, its property will either return bool (for a /S or /O argument), or an empty variant otherwise. */
   // readonly [key: string]: boolean | number | string | DOpusVector<boolean | number | string>;
   readonly [key: string]:
-    | boolean
-    | number
-    | string
-    | DOpusVector<boolean | number | string>
-    | DOpusArgsHelper;
+  | boolean
+  | number
+  | string
+  | DOpusVector<boolean | number | string | DOpusItem>
+  | DOpusArgsHelper;
 
   /**
    * The got_arg property returns an object with a bool child property for each argument in the template. It lets you test if a particular argument was provided on the command line, before you actually query for the value of the argument. For example, If Args.got_arg.size Then...
@@ -1244,7 +1244,7 @@ interface DOpusControl {
  *
  * @see {DOpusGetNewNameData}
  */
-interface DOpusCustomFieldData extends Object {}
+interface DOpusCustomFieldData extends Object { }
 
 /**
  * The Date object is provided to make it easier to deal with variables representing dates. It converts automatically to an ActiveX VT_DATE value and so can function as a drop-in replacement for a scripting language's native date variables. The main advantage is that it retains milliseconds, unlike VT_DATE which has a one second resolution. It also provides some utility methods to manipulate dates. The Item object has a number of properties that returns Date objects.
@@ -2172,7 +2172,7 @@ interface DOpusDisplayModeChangeData {
  *
  * @returns {number} This is a handle to the window of the floating toolbar. It is not particularly useful.
  */
-interface DOpusDock extends Number {}
+interface DOpusDock extends Number { }
 
 /**
  * The DocMeta object is retrieved from the Metadata .doc or Metadata .doc_text properties. It provides access to metadata relating to document files.
@@ -6665,7 +6665,7 @@ interface DOpusSourceDestData {
  *
  * @see {DOpusOnStartup}
  */
-interface DOpusStartupData {}
+interface DOpusStartupData { }
 
 /**
  * The StringSet object is container that stores one or more unique strings. It is similar to an array or vector (e.g. Vector ) but has the advantage of using a dictionary system to locate strings rather than numeric indexes. You can therefore lookup strings much more quickly than by linearly searching a Vector .
@@ -6753,21 +6753,21 @@ interface DOpusStringTools {
 
   /**
 
-	 * Encodes a string or data.
-	 *
-	 * You can provide either a Blob object or a string as the source to decode. Depending on the value of the format argument, either a string or a Blob is returned. Valid formats are:
-	 *
-	 * * **base64**	The source will be Base64-encoded, and a string is returned.
-	 * * **quoted**	The source will be Quoted-printable-encoded, and a string is returned.
-	 * * **utf-8**	The source will be converted to UTF-8 without a byte-order-mark (BOM).
-	 * * **utf-8 bom**	The source will be converted to UTF-8 with a BOM at the start.
-	 * * **utf-16|utf-16-le**	The source will be converted to UTF-16 Little Endian without a BOM.
-	 * * **utf-16 bom|utf-16-le bom**	The source will be converted to UTF-16 Little Endian with a BOM.
-	 * * **utf-16-be**	The source will be converted to UTF-16 Big Endian without a BOM.
-	 * * **utf-16-be bom**	The source will be converted to UTF-16 Big Endian with a BOM.
-	 *
-	 * Otherwise, format must be set to a valid code-page name (e.g. "gb2312", "utf-8" etc.), or a Windows code-page ID (e.g. 936, 65001). The source will be encoded using the specified code-page and a Blob is returned.
-	 */
+   * Encodes a string or data.
+   *
+   * You can provide either a Blob object or a string as the source to decode. Depending on the value of the format argument, either a string or a Blob is returned. Valid formats are:
+   *
+   * * **base64**	The source will be Base64-encoded, and a string is returned.
+   * * **quoted**	The source will be Quoted-printable-encoded, and a string is returned.
+   * * **utf-8**	The source will be converted to UTF-8 without a byte-order-mark (BOM).
+   * * **utf-8 bom**	The source will be converted to UTF-8 with a BOM at the start.
+   * * **utf-16|utf-16-le**	The source will be converted to UTF-16 Little Endian without a BOM.
+   * * **utf-16 bom|utf-16-le bom**	The source will be converted to UTF-16 Little Endian with a BOM.
+   * * **utf-16-be**	The source will be converted to UTF-16 Big Endian without a BOM.
+   * * **utf-16-be bom**	The source will be converted to UTF-16 Big Endian with a BOM.
+   *
+   * Otherwise, format must be set to a valid code-page name (e.g. "gb2312", "utf-8" etc.), or a Windows code-page ID (e.g. 936, 65001). The source will be encoded using the specified code-page and a Blob is returned.
+   */
   encode(source?: DOpusBlob | string, format?: string): string | DOpusBlob;
 
   /**
