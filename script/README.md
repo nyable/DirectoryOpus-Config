@@ -10,27 +10,64 @@
 
 ### 自动解压 - [SmartExtract](/script/SmartExtract.js)
 
-增加一个命令`SmartExtract`，用于解决解压时文件没有文件夹或同名文件夹嵌套问题。  
-包含一个设置项`CONFIG_FORCE_UNNEST`是否开启强制取消嵌套。  
-类似 `Bandizip`的自动解压。规则如下:
+增加一个命令 `SmartExtract`，用于智能解压压缩包，自动避免无意义的文件夹嵌套问题。  
+类似 `Bandizip` 的智能解压功能，通过预检查压缩包结构和配置项，进行不同的解压策略。
 
-1. 创建一个与压缩包同名的文件夹，并将压缩包的内容解压至其中
-2. 如果内容的最外层有多个文件或文件夹，不进行任何操作
-3. 如果内容的最外层只有一个文件夹，根据是否开启强制取消嵌套进行操作
-4. 未开启强制取消嵌套时，仅在最外层目录和压缩包同名时，往上移动一级该目录
-5. 开启强制取消嵌套时，将把最外层目录先重命名为压缩包名称，然后往上移动一级该目录
+
+#### 配置选项
+
+脚本包含三个可配置项，可在 **脚本管理** 中设置：
+
+1. **WRAP_SINGLE_FILE** (默认: `true`)
+   - 单个文件是否创建文件夹包裹
+   - `true`: 单个文件解压到同名文件夹
+   - `false`: 单个文件直接解压到当前目录
+
+2. **RENAME_FOLDER_TO_ARCHIVE** (默认: `false`)
+   - 单个文件夹是否重命名为压缩包名
+   - `true`: 根文件夹重命名为压缩包名
+   - `false`: 保持原文件夹名
+
+3. **FORCE_UNNEST** (默认: `false`)
+   - 强制取消嵌套（单个文件夹时始终直接解压）
+   - `true`: 单个根文件夹始终直接解压，配合 RENAME_FOLDER_TO_ARCHIVE 可选择是否重命名
+   - `false`: 使用默认智能判断逻辑
+
+
+| 压缩包 | 内容 | 配置 | 结果 |
+|--------|------|------|------|
+| `test.zip` | `test/` (同名文件夹) | 默认 | `test/` (直接解压) |
+| `test.zip` | `content/` (不同名文件夹) | 默认 | `test/content/` |
+| `test.zip` | `content/` | FORCE_UNNEST=true | `content/` (直接解压) |
+| `v1.0.zip` | `app/` | FORCE_UNNEST=true<br>RENAME_FOLDER=true | `v1.0/` (重命名) |
+| `data.zip` | `f1.txt`, `f2.txt` | 默认 | `data/f1.txt`, `data/f2.txt` |
+| `readme.zip` | `readme.txt` | WRAP_SINGLE_FILE=false | `readme.txt` (直接解压) |
 
 #### 额外依赖
 
 无
 
-#### 例子
+#### 使用示例
 
 `SmartExtract <path1> [<path2> ...]`
 
-1. 解压单个文件`SmartExtract 压缩文件A的全路径`=>`SmartExtract C:/Users/nyable/Downloads/A.zip`
-2. 解压多个文件`SmartExtract 压缩文件A的全路径 压缩文件B的全路径`=>`SmartExtract C:/Users/nyable/Downloads/A.zip C:/Users/nyable/Downloads/B.zip`
-3. 解压选中的多个文件`SmartExtract {allfilepath$}`，可以自定义一个按钮，类型选择`标准功能(DOpus或外部程序)`，内容`SmartExtract {allfilepath$}`，选择压缩文件并点击按钮后，会解压所选的所有压缩文件。
+1. **解压单个文件**：
+   ```
+   SmartExtract "C:\Downloads\test.zip"
+   ```
+   或在按钮中使用：`SmartExtract {filepath}`
+
+2. **解压多个选中的文件**：
+   ```
+   SmartExtract "C:\Downloads\file1.zip" "C:\Downloads\file2.zip"
+   ```
+   或在按钮中使用：`SmartExtract {allfilepath$}`
+
+3. **自定义按钮示例**：
+   - 新建按钮，类型选择 `标准功能(DOpus或外部程序)`
+   - 命令内容填写：`SmartExtract {allfilepath$}`
+   - 选中一个或多个压缩包后点击按钮即可批量解压
+
 
 ### 重新打开关闭的标签页 - [RecoverCloseTab](/script/RecoverCloseTab.js)
 
