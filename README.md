@@ -8,4 +8,5 @@
 
 - [script](/script/): 用于 Opus 的脚本,包括重命名脚本/自定义用户脚本以及res目录中dcf资源内的对应脚本等。 [文档](/script/README.md)
 - [resource](/resource/): 由 Opus 导出的资源文件,可能是 dcf、dis 或其他类型。主要是按钮、主题、图标包等。 [文档](/resource/README.md)
+- [rename](/rename/): 重命名脚本。 [文档](/rename/README.md)
 - [bin](/bin/): 一些功能或脚本依赖的第三方可执行文件或说明。
