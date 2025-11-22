@@ -414,7 +414,7 @@ function GetFormatInfo(appPath, url, extraArgs) {
   } else {
     DOpus.output('❌ yt-dlp 执行失败，返回代码: ' + result.returncode)
     if (result.stderr) {
-      DOpus.output('错误信息: ' + result.stderr.substring(0, 200))
+      DOpus.output('错误信息: ' + result.stderr)
     }
   }
   return null
