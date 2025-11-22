@@ -41,6 +41,9 @@ function OnInit(initData) {
   initData.config.D_EmbedMetadata = false
   initData.config_desc.Set("D_EmbedMetadata", "默认启用: 嵌入元数据 (--embed-metadata)")
 
+  initData.config.D_CreateSubfolder = false
+  initData.config_desc.Set("D_CreateSubfolder", "将文件保存到以标题命名的子目录中")
+
   initData.config.D_MergeFormat = ""
   initData.config_desc.Set("D_MergeFormat", "视频合并格式 (例如 mp4, mkv)，留空则使用默认")
 
@@ -75,6 +78,7 @@ function OnYtDlpDownload(cmdData) {
     writeThumbnail: Script.config.D_WriteThumbnail,
     embedThumbnail: Script.config.D_EmbedThumbnail,
     embedMetadata: Script.config.D_EmbedMetadata,
+    createSubfolder: Script.config.D_CreateSubfolder,
     mergeFormat: Script.config.D_MergeFormat,
     audioFormat: Script.config.D_AudioFormat,
     proxy: Script.config.N_Proxy
@@ -85,6 +89,14 @@ function OnYtDlpDownload(cmdData) {
   if (globalOpts.proxy) {
     commonArgs += ' --proxy "' + globalOpts.proxy + '"'
     DOpus.output("✓ 使用代理: " + globalOpts.proxy)
+  }
+
+  // 构建输出模板参数 (Subfolder)
+  var outputArgs = ""
+  if (globalOpts.createSubfolder) {
+    // 使用 / 作为分隔符，yt-dlp 会自动处理路径
+    outputArgs = ' -o "%(title)s/%(title)s.%(ext)s"'
+    DOpus.output("✓ 启用: 保存到子目录")
   }
 
   // 1. 扫描 Cookie 文件
@@ -184,7 +196,7 @@ function OnYtDlpDownload(cmdData) {
     if (globalOpts.embedMetadata) extraArgs += " --embed-metadata"
     if (globalOpts.mergeFormat) extraArgs += ' --merge-output-format "' + globalOpts.mergeFormat + '"'
 
-    var cmdLine = appPath + ' "' + url + '" -f "bestvideo+bestaudio/best"' + extraArgs + cookieArgs + commonArgs + ' -P "' + dirPath + '"'
+    var cmdLine = appPath + ' "' + url + '" -f "bestvideo+bestaudio/best"' + extraArgs + cookieArgs + commonArgs + outputArgs + ' -P "' + dirPath + '"'
     DOpus.output('执行命令: ' + cmdLine)
     DOpus.output(repeatStr("=", 60))
     cmd.runCommand(cmdLine)
@@ -266,8 +278,8 @@ function OnYtDlpDownload(cmdData) {
       mergeArgs = ' --merge-output-format "' + globalOpts.mergeFormat + '"'
     }
 
-    // 组合命令：格式参数 + 下载选项 + Cookie参数 + 代理参数 + 合并参数
-    var cmdLine = appPath + ' "' + url + '" -f "' + params.join('+') + '"' + extraOpts + cookieArgs + commonArgs + mergeArgs + ' -P "' + dirPath + '"'
+    // 组合命令：格式参数 + 下载选项 + Cookie参数 + 代理参数 + 合并参数 + 输出模板参数
+    var cmdLine = appPath + ' "' + url + '" -f "' + params.join('+') + '"' + extraOpts + cookieArgs + commonArgs + mergeArgs + outputArgs + ' -P "' + dirPath + '"'
     DOpus.output('执行命令: ' + cmdLine)
     DOpus.output(repeatStr("=", 60))
     cmd.runCommand(cmdLine)
@@ -286,7 +298,7 @@ function OnYtDlpDownload(cmdData) {
 
     DOpus.output("")
     DOpus.output(repeatStr("=", 20) + "开始下载" + repeatStr("=", 20))
-    var cmdLine = appPath + ' "' + url + '" -f bestaudio' + audioArgs + cookieArgs + commonArgs + ' -P "' + dirPath + '"'
+    var cmdLine = appPath + ' "' + url + '" -f bestaudio' + audioArgs + cookieArgs + commonArgs + outputArgs + ' -P "' + dirPath + '"'
     DOpus.output('执行命令: ' + cmdLine)
     DOpus.output(repeatStr("=", 60))
     cmd.runCommand(cmdLine)
