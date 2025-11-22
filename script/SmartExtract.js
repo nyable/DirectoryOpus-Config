@@ -1,4 +1,4 @@
-﻿///<reference path="./_DOpusDefinitions.d.ts" />
+﻿///<reference path="../types/_DOpusDefinitions.d.ts" />
 //@ts-check
 // SmartExtract
 // (c) 2024 nyable
@@ -134,6 +134,7 @@ function analyzeArchive(archivePath) {
       rootItemName: rootItemName
     }
   } catch (e) {
+    // @ts-ignore
     DOpus.output('  ✗ 读取失败: ' + e.message)
     return null
   }

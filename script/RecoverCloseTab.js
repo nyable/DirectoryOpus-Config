@@ -1,4 +1,4 @@
-﻿///<reference path="./_DOpusDefinitions.d.ts" />
+﻿///<reference path="../types/_DOpusDefinitions.d.ts" />
 //@ts-check
 // RecoverCloseTab
 // (c) 2024 nyable
@@ -26,7 +26,7 @@ var CONFIG_MIN_SIZE_LISTER_CACHE_START = 'MIN_SIZE_LISTER_CACHE_START'
  * Called by Directory Opus to initialize the script
  * @param {DOpusScriptInitData} initData 
  */
-function OnInit (initData) {
+function OnInit(initData) {
   initData.name = "RecoverCloseTab"
   initData.version = "1.1"
   initData.copyright = "(c) 2024 nyable"
@@ -75,7 +75,7 @@ function OnInit (initData) {
  * 恢复标签页
  * @param {DOpusScriptCommandData} cmdData 
  */
-function OnRecoverTab (cmdData) {
+function OnRecoverTab(cmdData) {
 
   var args = cmdData.func.args
   var cmd = cmdData.func.command
@@ -135,7 +135,7 @@ function OnRecoverTab (cmdData) {
  * 清除所有缓存
  * @param {DOpusScriptCommandData} cmdData 
  */
-function OnClearRecoverTabCache (cmdData) {
+function OnClearRecoverTabCache(cmdData) {
   clearAllTabCache()
 }
 
@@ -145,7 +145,7 @@ function OnClearRecoverTabCache (cmdData) {
  * 打开缓存管理器
  * @param {DOpusScriptCommandData} cmdData 
  */
-function OnOpenRecoverTabManager (cmdData) {
+function OnOpenRecoverTabManager(cmdData) {
 
   if (Script.vars.Exists(CACHE_KEY)) {
     var dlg = cmdData.func.dlg()
@@ -185,7 +185,7 @@ function OnOpenRecoverTabManager (cmdData) {
  * Called when a tab is closed
  * @param {DOpusCloseTabData} closeTabData 
  */
-function OnCloseTab (closeTabData) {
+function OnCloseTab(closeTabData) {
   if (!Script.vars.Exists(CACHE_KEY)) {
     Script.vars.Set(CACHE_KEY, DOpus.create().vector())
   }
@@ -212,11 +212,12 @@ function OnCloseTab (closeTabData) {
  * Called when a lister is closed
  * @param {DOpusCloseListerData} closeListerData 
  */
-function OnCloseLister (closeListerData) {
+function OnCloseLister(closeListerData) {
   if (Script.config[CONFIG_ENABLE_LISTER_CACHE]) {
     if (!Script.vars.Exists(CACHE_KEY)) {
       Script.vars.Set(CACHE_KEY, DOpus.create().vector())
     }
+
     var tabs = closeListerData.lister.tabs
     // @ts-ignore
     var count = tabs.count
@@ -227,6 +228,7 @@ function OnCloseLister (closeListerData) {
       }
       var paths = []
       for (var i = 0; i < count; i++) {
+        // @ts-ignore
         paths[i] = String(tabs[i].path)
       }
       value.push_back(JSON.stringify(
@@ -247,7 +249,7 @@ function OnCloseLister (closeListerData) {
 /**
  * 清除所有缓存
  */
-function clearAllTabCache () {
+function clearAllTabCache() {
   if (Script.vars.Exists(CACHE_KEY)) {
     Script.vars.Delete(CACHE_KEY)
   }

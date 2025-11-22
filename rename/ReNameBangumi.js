@@ -1,4 +1,4 @@
-﻿///<reference path="./_DOpusDefinitions.d.ts" />
+﻿///<reference path="../types/_DOpusDefinitions.d.ts" />
 //@ts-check
 /**
  * 对文件进行重命名

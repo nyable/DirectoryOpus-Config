@@ -1,6 +1,4 @@
-﻿///&lt;reference path="./_DOpusDefinitions.d.ts" /&gt;
-//-@ts-check
-// YtDlpInvoke
+﻿// YtDlpInvoke
 // (c) 2024 nyable
 
 /**

@@ -1244,7 +1244,7 @@ interface DOpusControl {
  *
  * @see {DOpusGetNewNameData}
  */
-interface DOpusCustomFieldData extends Object { }
+type DOpusCustomFieldData = Record<string, string | undefined>;
 
 /**
  * The Date object is provided to make it easier to deal with variables representing dates. It converts automatically to an ActiveX VT_DATE value and so can function as a drop-in replacement for a scripting language's native date variables. The main advantage is that it retains milliseconds, unlike VT_DATE which has a one second resolution. It also provides some utility methods to manipulate dates. The Item object has a number of properties that returns Date objects.

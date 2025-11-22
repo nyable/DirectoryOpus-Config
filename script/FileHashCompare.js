@@ -1,4 +1,4 @@
-///<reference path="./_DOpusDefinitions.d.ts" />
+///<reference path="../types/_DOpusDefinitions.d.ts" />
 //@ts-check
 /**
  *  md5: 068ac8360ac6c138caf4a16d25dc1b40  32
@@ -48,7 +48,7 @@ var LT_TEXT_COLOR = 'text_color'
  * 进行Hash对比或计算
  * @param {DOpusClickData} clickData 
  */
-function OnClick (clickData) {
+function OnClick(clickData) {
   var sourceTab = clickData.func.sourceTab
   var selected = sourceTab.selected
 
@@ -175,7 +175,7 @@ function OnClick (clickData) {
  * @param {string} message  结果显示的信息文本
  * @param {boolean} ok  结果对应的颜色(true:绿色, false:红色,null:橙色)
  */
-function setResult (dlg, message, ok) {
+function setResult(dlg, message, ok) {
   var resultTextArea = dlg.control(LT_TEXT_RESULT, LT_TAB1)
   var resultColor = dlg.control(LT_TEXT_COLOR, LT_TAB1)
   resultTextArea.value = message
@@ -191,7 +191,7 @@ function setResult (dlg, message, ok) {
  * @param {DOpusDialog} dlg 
  * @param {boolean} waiting 
  */
-function waiting (dlg, waiting) {
+function waiting(dlg, waiting) {
   dlg.control(LT_BT_COMPARE, LT_TAB1).enabled = !waiting
   dlg.control(LT_BT_HASH, LT_TAB2).enabled = !waiting
   dlg.control(LT_BT_CLEAR, LT_TAB2).enabled = !waiting
@@ -202,13 +202,18 @@ function waiting (dlg, waiting) {
  * 清空tab2中的结果
  * @param {DOpusDialog} dlg 
  */
-function clearHash (dlg) {
+function clearHash(dlg) {
   for (var i = 0; i < types.length; i++) {
     var type = types[i]
     dlg.control(type.name, LT_TAB2).value = ''
   }
 }
 
-function t (type) {
+/**
+ * 
+ * @param {string} type 
+ * @returns 
+ */
+function t(type) {
   return 't_' + type
 }

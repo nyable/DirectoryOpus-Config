@@ -1,4 +1,4 @@
-﻿///<reference path="./_DOpusDefinitions.d.ts" />
+﻿///<reference path="../types/_DOpusDefinitions.d.ts" />
 //@ts-check
 // (c) 2024 nyable
 
@@ -81,7 +81,7 @@ var ABR = {
  * @param {DOpusClickData} clickData 
  * @returns 
  */
-function OnClick (clickData) {
+function OnClick(clickData) {
 
   var selected = clickData.func.sourceTab.selected
   var fileCount = selected.count
@@ -211,7 +211,7 @@ function OnClick (clickData) {
  * @param {*} defaultObj 
  * @param {string} pName 
  */
-function setupDefault (dlg, defaultObj, pName) {
+function setupDefault(dlg, defaultObj, pName) {
   for (var key in defaultObj) {
     var op = defaultObj[key]
     var opName = op.name
