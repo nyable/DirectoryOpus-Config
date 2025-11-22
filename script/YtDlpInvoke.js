@@ -59,7 +59,7 @@ function OnYtDlpDownload(cmdData) {
   var dlg = DOpus.dlg()
   dlg.window = DOpus.listers[0]
   dlg.message = "📥 yt-dlp 视频下载工具\n\n" +
-    "请输入视频 URL（支持 YouTube、Bilibili 等）\n\n" +
+    "请输入视频 URL\n\n" +
     "• 直接下载：自动选择最佳质量\n" +
     "• 自定义格式：手动选择视频/音频格式\n" +
     "• 仅音频：仅下载音频并转为 MP3"
@@ -123,7 +123,7 @@ function OnYtDlpDownload(cmdData) {
   DOpus.output("输入的 URL: " + url)
 
   if (!/^https?:\/\/.+/.test(url)) {
-    DOpus.dlg().request('❌ URL 格式不正确\n\n请输入以 http:// 或 https:// 开头的完整链接\n\n例如：\n• https://www.youtube.com/watch?v=xxxxx\n• https://www.bilibili.com/video/BVxxxxxx', '确定')
+    DOpus.dlg().request('❌ URL 格式不正确\n\n请输入以 http:// 或 https:// 开头的完整链接', '确定')
     return
   }
 
