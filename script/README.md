@@ -93,17 +93,39 @@
 4. ENABLE_LISTER_CACHE:是否缓存关闭的窗口 默认:false
 5. MIN_SIZE_LISTER_CACHE_START:缓存窗口所需最少标签页数量，即窗口中的标签页小于该数值时不进行缓存 默认:2
 
-## 非命令脚本
-
-一般用于添加到自定义按钮之类的触发式执行。
-
 ### 调用 yt-dlp 下载视频 - [YtDlpInvoke](/script/YtDlpInvoke.js)
 
 调用命令行工具[yt-dlp](https://github.com/yt-dlp/yt-dlp)进行视频的下载，支持直接选用最佳质量和显示所有格式化并自选。
 
+#### 配置选项
+
+脚本包含多个可配置项，可在 **脚本管理** 中设置，按前缀分类：
+
+**A_ (App / 程序设置)**
+- `A_YtDlpPath`: `yt-dlp` 可执行文件路径 (默认: `yt-dlp`)
+
+**C_ (Cookie / Cookie 设置)**
+- `C_ExtraCookieDir`: 额外的 Cookie 搜索目录 (默认: `/mydocuments`)
+- `C_AutoCookie`: 是否自动扫描并启用 Cookie (默认: `false`)
+
+**D_ (Download / 下载设置)**
+- `D_WriteSubs`: 下载字幕 (默认: `false`)
+- `D_WriteAutoSubs`: 下载自动生成的字幕 (默认: `false`)
+- `D_WriteThumbnail`: 下载缩略图/封面 (默认: `false`)
+- `D_EmbedThumbnail`: 嵌入缩略图到文件 (默认: `false`)
+- `D_EmbedMetadata`: 嵌入元数据 (默认: `false`)
+- `D_MergeFormat`: 视频合并格式 (如 `mp4`, `mkv`)，留空使用默认
+- `D_AudioFormat`: 音频下载格式 (如 `mp3`, `m4a`)，留空使用默认
+- `D_CreateSubfolder`: 将文件保存到以标题命名的子目录中 (默认: `false`)
+
+**N_ (Network / 网络设置)**
+- `N_Proxy`: 网络代理地址 (如 `http://127.0.0.1:7890`)，留空不使用
+
 #### 额外依赖
 
 1. 需要[yt-dlp](https://github.com/yt-dlp/yt-dlp)
+
+
 
 ## 重命名脚本
 
