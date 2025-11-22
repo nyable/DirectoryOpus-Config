@@ -1,5 +1,5 @@
 ﻿///&lt;reference path="./_DOpusDefinitions.d.ts" /&gt;
-//@ts-check
+//-@ts-check
 // YtDlpInvoke
 // (c) 2024 nyable
 
@@ -41,6 +41,15 @@ function OnInit(initData) {
   initData.config.D_EmbedMetadata = false
   initData.config_desc.Set("D_EmbedMetadata", "默认启用: 嵌入元数据 (--embed-metadata)")
 
+  initData.config.D_MergeFormat = ""
+  initData.config_desc.Set("D_MergeFormat", "视频合并格式 (例如 mp4, mkv)，留空则使用默认")
+
+  initData.config.D_AudioFormat = ""
+  initData.config_desc.Set("D_AudioFormat", "音频下载格式 (例如 mp3, m4a)，留空则使用默认格式")
+
+  initData.config.N_Proxy = ""
+  initData.config_desc.Set("N_Proxy", "网络代理 (例如 http://127.0.0.1:7890)，留空不使用")
+
   var cmd = initData.addCommand()
   cmd.name = "YtDlpDownload"
   cmd.method = "OnYtDlpDownload"
@@ -65,7 +74,17 @@ function OnYtDlpDownload(cmdData) {
     writeAutoSubs: Script.config.D_WriteAutoSubs,
     writeThumbnail: Script.config.D_WriteThumbnail,
     embedThumbnail: Script.config.D_EmbedThumbnail,
-    embedMetadata: Script.config.D_EmbedMetadata
+    embedMetadata: Script.config.D_EmbedMetadata,
+    mergeFormat: Script.config.D_MergeFormat,
+    audioFormat: Script.config.D_AudioFormat,
+    proxy: Script.config.N_Proxy
+  }
+
+  // 构建通用参数 (Proxy)
+  var commonArgs = ""
+  if (globalOpts.proxy) {
+    commonArgs += ' --proxy "' + globalOpts.proxy + '"'
+    DOpus.output("✓ 使用代理: " + globalOpts.proxy)
   }
 
   // 1. 扫描 Cookie 文件
@@ -163,8 +182,9 @@ function OnYtDlpDownload(cmdData) {
     if (globalOpts.writeThumbnail) extraArgs += " --write-thumbnail"
     if (globalOpts.embedThumbnail) extraArgs += " --embed-thumbnail"
     if (globalOpts.embedMetadata) extraArgs += " --embed-metadata"
+    if (globalOpts.mergeFormat) extraArgs += ' --merge-output-format "' + globalOpts.mergeFormat + '"'
 
-    var cmdLine = appPath + ' "' + url + '" -f "bestvideo+bestaudio/best"' + extraArgs + cookieArgs + ' -P "' + dirPath + '"'
+    var cmdLine = appPath + ' "' + url + '" -f "bestvideo+bestaudio/best"' + extraArgs + cookieArgs + commonArgs + ' -P "' + dirPath + '"'
     DOpus.output('执行命令: ' + cmdLine)
     DOpus.output(repeatStr("=", 60))
     cmd.runCommand(cmdLine)
@@ -173,8 +193,8 @@ function OnYtDlpDownload(cmdData) {
     // 自定义格式
     DOpus.output("模式: 自定义格式选择")
 
-    // 第一步：获取格式信息 (传入 cookie 参数)
-    var formatInfo = GetFormatInfo(appPath, url, cookieArgs)
+    // 第一步：获取格式信息 (传入 cookie 和 proxy 参数)
+    var formatInfo = GetFormatInfo(appPath, url, cookieArgs + commonArgs)
     if (!formatInfo) {
       DOpus.output("❌ 获取视频信息失败")
       DOpus.dlg().request('❌ 无法获取视频信息\n\nURL: ' + url + '\n\n可能的原因：\n• 网络连接问题\n• URL 不正确或视频不可用\n• yt-dlp 未正确安装或不在 PATH 中\n• 需要 Cookie 但未提供', '确定')
@@ -238,18 +258,35 @@ function OnYtDlpDownload(cmdData) {
 
     DOpus.output("")
     DOpus.output(repeatStr("=", 20) + "开始下载" + repeatStr("=", 20))
-    // 组合命令：格式参数 + 下载选项 + Cookie参数
-    var cmdLine = appPath + ' "' + url + '" -f "' + params.join('+') + '"' + extraOpts + cookieArgs + ' -P "' + dirPath + '"'
+    DOpus.output(repeatStr("=", 20) + "开始下载" + repeatStr("=", 20))
+
+    // 如果有合并格式配置，也应用到自定义下载中
+    var mergeArgs = ""
+    if (globalOpts.mergeFormat) {
+      mergeArgs = ' --merge-output-format "' + globalOpts.mergeFormat + '"'
+    }
+
+    // 组合命令：格式参数 + 下载选项 + Cookie参数 + 代理参数 + 合并参数
+    var cmdLine = appPath + ' "' + url + '" -f "' + params.join('+') + '"' + extraOpts + cookieArgs + commonArgs + mergeArgs + ' -P "' + dirPath + '"'
     DOpus.output('执行命令: ' + cmdLine)
     DOpus.output(repeatStr("=", 60))
     cmd.runCommand(cmdLine)
 
   } else if (ret == 3) {
     // 仅音频
-    DOpus.output("模式: 仅音频下载（MP3）")
+    var audioFmt = globalOpts.audioFormat
+    var audioArgs = " -x"
+
+    if (audioFmt) {
+      audioArgs += " --audio-format " + audioFmt
+      DOpus.output("模式: 仅音频下载（" + audioFmt + "）")
+    } else {
+      DOpus.output("模式: 仅音频下载（默认格式）")
+    }
+
     DOpus.output("")
     DOpus.output(repeatStr("=", 20) + "开始下载" + repeatStr("=", 20))
-    var cmdLine = appPath + ' "' + url + '" -f bestaudio -x --audio-format mp3' + cookieArgs + ' -P "' + dirPath + '"'
+    var cmdLine = appPath + ' "' + url + '" -f bestaudio' + audioArgs + cookieArgs + commonArgs + ' -P "' + dirPath + '"'
     DOpus.output('执行命令: ' + cmdLine)
     DOpus.output(repeatStr("=", 60))
     cmd.runCommand(cmdLine)
