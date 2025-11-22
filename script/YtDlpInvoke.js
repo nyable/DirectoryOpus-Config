@@ -17,14 +17,29 @@ function OnInit(initData) {
 
   initData.config_desc = DOpus.Create.Map()
 
-  initData.config.YtDlpPath = "yt-dlp"
-  initData.config_desc.Set("YtDlpPath", "yt-dlp 可执行文件路径 (如果已在 PATH 中可直接填 yt-dlp)")
+  initData.config.A_YtDlpPath = "yt-dlp"
+  initData.config_desc.Set("A_YtDlpPath", "yt-dlp 可执行文件路径 (如果已在 PATH 中可直接填 yt-dlp)")
 
-  initData.config.ExtraCookieDir = "/mydocuments"
-  initData.config_desc.Set("ExtraCookieDir", "额外的 Cookie 搜索目录 (默认为文档目录)")
+  initData.config.C_ExtraCookieDir = "/mydocuments"
+  initData.config_desc.Set("C_ExtraCookieDir", "额外的 Cookie 搜索目录 (默认为文档目录)")
 
-  initData.config.AutoCookie = false
-  initData.config_desc.Set("AutoCookie", "是否自动扫描并启用 Cookie (默认关闭，开启后会自动扫描目录并根据结果勾选)")
+  initData.config.C_AutoCookie = false
+  initData.config_desc.Set("C_AutoCookie", "是否自动扫描并启用 Cookie (默认关闭，开启后会自动扫描目录并根据结果勾选)")
+
+  initData.config.D_WriteSubs = false
+  initData.config_desc.Set("D_WriteSubs", "默认启用: 下载字幕 (--write-subs)")
+
+  initData.config.D_WriteAutoSubs = false
+  initData.config_desc.Set("D_WriteAutoSubs", "默认启用: 下载自动字幕 (--write-auto-subs)")
+
+  initData.config.D_WriteThumbnail = false
+  initData.config_desc.Set("D_WriteThumbnail", "默认启用: 下载缩略图/封面 (--write-thumbnail)")
+
+  initData.config.D_EmbedThumbnail = false
+  initData.config_desc.Set("D_EmbedThumbnail", "默认启用: 嵌入缩略图 (--embed-thumbnail)")
+
+  initData.config.D_EmbedMetadata = false
+  initData.config_desc.Set("D_EmbedMetadata", "默认启用: 嵌入元数据 (--embed-metadata)")
 
   var cmd = initData.addCommand()
   cmd.name = "YtDlpDownload"
@@ -33,17 +48,25 @@ function OnInit(initData) {
   cmd.label = "YtDlpDownload"
   cmd.template = ""
 }
-
 /**
  * 点击时弹出对话框,根据选项调用yt-dlp
  * @param {DOpusScriptCommandData} cmdData 
  */
 function OnYtDlpDownload(cmdData) {
-  var appPath = Script.config.YtDlpPath
+  var appPath = Script.config.A_YtDlpPath
   var cmd = cmdData.func.command
   var dirPath = cmdData.func.sourceTab.path
-  var extraCookieDir = Script.config.ExtraCookieDir
-  var autoCookie = Script.config.AutoCookie
+  var extraCookieDir = Script.config.C_ExtraCookieDir
+  var autoCookie = Script.config.C_AutoCookie
+
+  // 获取全局配置的默认选项
+  var globalOpts = {
+    writeSubs: Script.config.D_WriteSubs,
+    writeAutoSubs: Script.config.D_WriteAutoSubs,
+    writeThumbnail: Script.config.D_WriteThumbnail,
+    embedThumbnail: Script.config.D_EmbedThumbnail,
+    embedMetadata: Script.config.D_EmbedMetadata
+  }
 
   // 1. 扫描 Cookie 文件
   // 如果开启了自动扫描，或者用户手动勾选了使用Cookie(在对话框后处理)，则需要扫描
@@ -132,7 +155,16 @@ function OnYtDlpDownload(cmdData) {
     DOpus.output("模式: 直接下载（最佳质量）")
     DOpus.output("")
     DOpus.output(repeatStr("=", 20) + "开始下载" + repeatStr("=", 20))
-    var cmdLine = appPath + ' "' + url + '" -f "bestvideo+bestaudio/best"' + cookieArgs + ' -P "' + dirPath + '"'
+
+    // 构建直接下载的额外参数
+    var extraArgs = ""
+    if (globalOpts.writeSubs) extraArgs += " --write-subs"
+    if (globalOpts.writeAutoSubs) extraArgs += " --write-auto-subs"
+    if (globalOpts.writeThumbnail) extraArgs += " --write-thumbnail"
+    if (globalOpts.embedThumbnail) extraArgs += " --embed-thumbnail"
+    if (globalOpts.embedMetadata) extraArgs += " --embed-metadata"
+
+    var cmdLine = appPath + ' "' + url + '" -f "bestvideo+bestaudio/best"' + extraArgs + cookieArgs + ' -P "' + dirPath + '"'
     DOpus.output('执行命令: ' + cmdLine)
     DOpus.output(repeatStr("=", 60))
     cmd.runCommand(cmdLine)
@@ -190,7 +222,15 @@ function OnYtDlpDownload(cmdData) {
     }
 
     // 第三步：选择下载选项
-    var extraOpts = GetDownloadOptions()
+    // 传入全局配置作为默认值
+    var defaultValues = [
+      globalOpts.writeSubs,
+      globalOpts.writeAutoSubs,
+      globalOpts.writeThumbnail,
+      globalOpts.embedThumbnail,
+      globalOpts.embedMetadata
+    ]
+    var extraOpts = GetDownloadOptions(defaultValues)
     if (extraOpts === null) {
       DOpus.output("用户取消选项配置")
       return
@@ -330,9 +370,10 @@ function GetBestCookieFile(url, files) {
 
 /**
  * 获取下载选项配置
+ * @param {boolean[]} [defaultValues] 默认勾选状态数组
  * @returns 额外的命令行参数，如果用户取消则返回null
  */
-function GetDownloadOptions() {
+function GetDownloadOptions(defaultValues) {
   var dlg = DOpus.dlg()
   dlg.window = DOpus.listers[0]
   dlg.message = "⚙️ 下载选项配置\n\n请选择需要的额外选项："
@@ -348,7 +389,7 @@ function GetDownloadOptions() {
     "嵌入元数据 (--embed-metadata)"
   ]
 
-  var list = [false, false, false, false, false]
+  var list = defaultValues || [false, false, false, false, false]
 
   dlg.choices = choices
   dlg.list = list
