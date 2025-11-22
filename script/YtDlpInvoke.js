@@ -1,6 +1,6 @@
-﻿///<reference path="./_DOpusDefinitions.d.ts" />
+﻿///&lt;reference path="./_DOpusDefinitions.d.ts" /&gt;
 //@ts-check
-// SmartExtract
+// YtDlpInvoke
 // (c) 2024 nyable
 
 // This is a script for Directory Opus.
@@ -9,127 +9,207 @@
 /**
  * 点击时弹出对话框,根据选项调用yt-dlp
  * @param {DOpusClickData} clickData 
- * @returns 
  */
-function OnClick (clickData) {
+function OnClick(clickData) {
   var appPath = 'yt-dlp'
 
   var dlg = DOpus.dlg()
-
   dlg.window = DOpus.listers[0]
-  dlg.message = "输入URL后点击解析获取可用格式\n也可以直接下载(最佳可用质量)"
-  dlg.title = "yt-dlp"
-  dlg.buttons = "直接下载|自定义输出|取消"
-  dlg.icon = "warn"
-  dlg.max = 256 // enable the text field
-  // dlg.options(0).label = "Checkbox option 1"
-  // dlg.options(1).label = "Checkbox option 2"
+  dlg.message = "📥 yt-dlp 视频下载工具\n\n" +
+    "请输入视频 URL（支持 YouTube、Bilibili 等）\n\n" +
+    "• 直接下载：自动选择最佳质量\n" +
+    "• 自定义格式：手动选择视频/音频格式\n" +
+    "• 仅音频：仅下载音频并转为 MP3"
+  dlg.title = "yt-dlp 视频下载"
+  dlg.buttons = "直接下载|自定义格式|仅音频|取消"
+  dlg.icon = "info"
+  dlg.max = 512
 
   var ret = dlg.show()
-  var url = dlg.input
-  DOpus.output("Input URL is: " + url)
-  // DOpus.Output("The two checkboxes were set to " + dlg.options(0).state + " and " + dlg.options(1).state)
-
-
-  if (!/^(((ht|f)tps?):\/\/)?.+/.test(url)) {
-    DOpus.output("URL不合法,不进行任何操作")
-    DOpus.dlg().request('输入不合法,不进行操作!', '确定')
+  if (ret == 0) {
     return
   }
+
+  var url = dlg.input ? String(dlg.input) : ""
+  url = url.replace(/^\s+/, '').replace(/\s+$/, '')
+
+  if (!url) {
+    return
+  }
+
+  DOpus.output(repeatStr("=", 60))
+  DOpus.output("输入的 URL: " + url)
+
+  // URL 验证
+  if (!/^https?:\/\/.+/.test(url)) {
+    DOpus.dlg().request('❌ URL 格式不正确\n\n请输入以 http:// 或 https:// 开头的完整链接\n\n例如：\n• https://www.youtube.com/watch?v=xxxxx\n• https://www.bilibili.com/video/BVxxxxxx', '确定')
+    return
+  }
+
   var cmd = clickData.func.command
   var dirPath = clickData.func.sourceTab.path
 
   if (ret == 1) {
-    DOpus.output("直接下载")
-    var r = appPath + ' "' + url + '"' + ' -P "' + dirPath + '"'
-    DOpus.output('执行命令: ' + r)
-    cmd.runCommand(r)
+    // 直接下载（最佳质量）
+    DOpus.output("模式: 直接下载（最佳质量）")
+    var cmdLine = appPath + ' "' + url + '" -f "bestvideo+bestaudio/best" -P "' + dirPath + '"'
+    DOpus.output('执行命令: ' + cmdLine)
+    DOpus.output(repeatStr("=", 60))
+    cmd.runCommand(cmdLine)
+
   } else if (ret == 2) {
-    DOpus.output("自定义格式")
+    // 自定义格式选择
+    DOpus.output("模式: 自定义格式选择")
+    DOpus.output("正在获取视频信息...")
     var formatInfo = GetFormatInfo(appPath, url)
+
     if (!formatInfo) {
-      var eInfo = "地址:" + url + "解析结果为空,结束执行"
-      DOpus.output(eInfo)
-      DOpus.dlg().request(eInfo, '确定')
+      DOpus.output("❌ 获取视频信息失败")
+      DOpus.dlg().request('❌ 无法获取视频信息\n\nURL: ' + url + '\n\n可能的原因：\n• 网络连接问题\n• URL 不正确或视频不可用\n• yt-dlp 未正确安装或不在 PATH 中', '确定')
       return
     }
+
     var formatDlg = DOpus.dlg()
     formatDlg.window = DOpus.listers[0]
-    formatDlg.message = "勾选需要的格式化选项,将作为-f后的参数"
-    formatDlg.title = formatInfo.title + '[' + formatInfo.id + ']'
-    formatDlg.buttons = "确定|取消"
-    formatDlg.icon = "warn"
-    formatDlg.max = 128 // enable the text field
+    formatDlg.message = "📹 请选择要下载的格式\n\n" +
+      "可以选择多个格式，将自动合并\n" +
+      "（通常选择：1个视频格式 + 1个音频格式）\n\n" +
+      "视频：" + formatInfo.title
+    formatDlg.title = "格式选择 [" + formatInfo.id + "]"
+    formatDlg.buttons = "确定下载|取消"
+    formatDlg.icon = "info"
+    formatDlg.max = 256
+
     var choices = []
     var list = []
-
     var formatList = formatInfo.formats
 
     for (var i = 0; i < formatList.length; i++) {
       var fo = formatList[i]
-      choices.push(leftPad(i, 3) + '. ' + fo.ext + '(' + fo.resolution + ')   ' + (fo.filesize ? (formatBytes(fo.filesize)) : 'unknown') + '  ' + fo.format)
+
+      // 判断格式类型
+      var typeLabel = ""
+      if (fo.vcodec && fo.vcodec != "none" && fo.acodec && fo.acodec != "none") {
+        typeLabel = "[视+音] "
+      } else if (fo.vcodec && fo.vcodec != "none") {
+        typeLabel = "[视频] "
+      } else if (fo.acodec && fo.acodec != "none") {
+        typeLabel = "[音频] "
+      }
+
+      // 格式化显示
+      var resolution = fo.resolution || "N/A"
+      var size = formatSize(fo.filesize)
+      var ext = fo.ext.toUpperCase()
+
+      // 编码信息
+      var codecInfo = ""
+      if (fo.vcodec && fo.vcodec != "none") {
+        codecInfo = fo.vcodec.substring(0, 8)
+        if (fo.fps) {
+          codecInfo += "@" + Math.round(fo.fps) + "fps"
+        }
+      }
+      if (fo.acodec && fo.acodec != "none") {
+        if (codecInfo) codecInfo += " + "
+        codecInfo += fo.acodec.substring(0, 8)
+        if (fo.abr) {
+          codecInfo += "@" + Math.round(fo.abr) + "k"
+        }
+      }
+
+      var desc = leftPad(i, 3) + ". " + typeLabel + ext + " " + padEnd(resolution, 12) + " " + padStart(size, 8)
+      if (codecInfo) {
+        desc += " [" + codecInfo + "]"
+      }
+
+      choices.push(desc)
       list.push(false)
     }
 
-
     formatDlg.choices = choices
     formatDlg.list = list
-
-    // formatDlg.options(0).label = "Checkbox option 1"
-    // formatDlg.options(1).label = "Checkbox option 2"
     var formatRet = formatDlg.show()
 
-    DOpus.output("Dialog.Show returned " + formatRet)
+    if (formatRet == 0) {
+      DOpus.output("用户取消格式选择")
+      return
+    }
+
     var params = []
     for (var i = 0; i < list.length; i++) {
-      var flag = formatDlg.list[i]
-      // DOpus.Output("list " + i + "returned " + formatDlg.list[i])
-      if (flag) {
-        var formatId = formatList[i].format_id
-        params.push(formatId)
+      if (formatDlg.list[i]) {
+        params.push(formatList[i].format_id)
+        DOpus.output("选择格式: " + formatList[i].format_id + " - " + formatList[i].format)
       }
     }
+
     if (params.length > 0) {
-      var r = appPath + ' "' + url + '" -f ' + '"' + params.join('+') + '" -P "' + dirPath + '"'
-      DOpus.output('执行命令: ' + r)
-      cmd.runCommand(r)
+      var cmdLine = appPath + ' "' + url + '" -f "' + params.join('+') + '" -P "' + dirPath + '"'
+      DOpus.output('执行命令: ' + cmdLine)
+      DOpus.output(repeatStr("=", 60))
+      cmd.runCommand(cmdLine)
+    } else {
+      DOpus.output("⚠ 未选择任何格式")
+      DOpus.dlg().request('⚠ 未选择任何格式\n\n请至少选择一个格式后再下载', '确定')
     }
 
+  } else if (ret == 3) {
+    // 仅音频下载
+    DOpus.output("模式: 仅音频下载（MP3）")
+    var cmdLine = appPath + ' "' + url + '" -f bestaudio -x --audio-format mp3 -P "' + dirPath + '"'
+    DOpus.output('执行命令: ' + cmdLine)
+    DOpus.output(repeatStr("=", 60))
+    cmd.runCommand(cmdLine)
+  }
+}
+
+/**
+ * 获取视频格式信息
+ * @param {string} appPath yt-dlp路径
+ * @param {string} url 视频URL
+ * @returns 格式信息对象
+ */
+function GetFormatInfo(appPath, url) {
+  var result = RunEx(appPath, '"' + url + '" -j')
+  if (result.returncode == 0) {
+    try {
+      var obj = JSON.parse(result.stdout)
+      DOpus.output('✓ 视频: ' + obj.title)
+      DOpus.output('✓ ID: ' + obj.id)
+      DOpus.output('✓ 可用格式: ' + obj.formats.length + ' 个')
+      return obj
+    } catch (e) {
+      DOpus.output('❌ JSON 解析失败: ' + e.message)
+    }
   } else {
-    DOpus.output("取消或无定义")
+    DOpus.output('❌ yt-dlp 执行失败，返回代码: ' + result.returncode)
+    if (result.stderr) {
+      DOpus.output('错误信息: ' + result.stderr.substring(0, 200))
+    }
   }
-
-
+  return null
 }
 
-
 /**
- * 获取视频URL可用格式的JSON对象
- * 
- * @param {string} appPath  yt-dlp可执行文件的路径,加到path后就不需要全路径了
- * @param {string} url 目标网址
- * @returns 返回JSON对象
+ * 重复字符串
+ * @param {string} str 要重复的字符
+ * @param {number} count 重复次数
  */
-function GetFormatInfo (appPath, url) {
-  DOpus.output('获取视频' + url + '格式信息')
-  var result = RunEx(appPath, url + " -j")
-  if (result.returncode == '0') {
-    var obj = JSON.parse(result.stdout)
-    var id = obj.id
-    var title = obj.title
-    var formats = obj.formats
-    DOpus.output('获取视频' + title + '[' + id + ']' + '格式信息' + formats.length + '条')
-    return obj
+function repeatStr(str, count) {
+  var result = ""
+  for (var i = 0; i < count; i++) {
+    result += str
   }
+  return result
 }
 
 /**
- * 向左补0
- * @param {string|number} str 字符串
+ * 左侧补0
+ * @param {*} str 字符串
  * @param {number} len 长度
- * @returns 补零后的结果
  */
-function leftPad (str, len) {
+function leftPad(str, len) {
   str = str + ''
   while (str.length < len) {
     str = "0" + str
@@ -138,16 +218,51 @@ function leftPad (str, len) {
 }
 
 /**
- * 通过shell执行命令并获取标准输入和输出
- * 
- * @param {string} exe 命令
- * @param {*} params 参数
- * @returns 结果对象
+ * 右侧填充空格
+ * @param {string} str 字符串
+ * @param {number} len 长度
  */
-function RunEx (exe, params) {
-  params = (params ? " " + params : "")
+function padEnd(str, len) {
+  str = str + ''
+  while (str.length < len) {
+    str = str + ' '
+  }
+  return str
+}
+
+/**
+ * 左侧填充空格
+ * @param {string} str 字符串
+ * @param {number} len 长度
+ */
+function padStart(str, len) {
+  str = str + ''
+  while (str.length < len) {
+    str = ' ' + str
+  }
+  return str
+}
+
+/**
+ * 格式化文件大小
+ * @param {number} bytes 字节数
+ */
+function formatSize(bytes) {
+  if (!bytes) return "未知"
+  if (bytes < 1024) return bytes + "B"
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + "KB"
+  if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + "MB"
+  return (bytes / 1073741824).toFixed(2) + "GB"
+}
+
+/**
+ * 执行命令并获取输出
+ * @param {string} exe 命令
+ * @param {string} params 参数
+ */
+function RunEx(exe, params) {
   var shell = new ActiveXObject("WScript.Shell")
-  var exec = shell.Exec(exe + params)
+  var exec = shell.Exec(exe + (params ? " " + params : ""))
   var stdOut = "", stdErr = ""
 
   while (exec.Status == 0) {
@@ -160,22 +275,4 @@ function RunEx (exe, params) {
     stdout: stdOut,
     stderr: stdErr
   }
-}
-
-/**
- * 格式化为便于人类阅读的字符串
- * @param {number} bytes 字节数
- * @returns 大小字符串
- */
-function formatBytes (bytes) {
-  if (bytes === undefined || bytes === null) {
-    return "unknown"
-  }
-
-  if (bytes === 0) return '0Bytes'
-
-  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  var i = Math.floor(Math.log(bytes) / Math.log(1024))
-
-  return (bytes / Math.pow(1024, i)).toFixed(2) + sizes[i]
 }
