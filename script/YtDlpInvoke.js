@@ -15,6 +15,17 @@ function OnInit(initData) {
   initData.default_enable = true
   initData.min_version = "12.0"
 
+  initData.config_desc = DOpus.Create.Map()
+
+  initData.config.YtDlpPath = "yt-dlp"
+  initData.config_desc.Set("YtDlpPath", "yt-dlp 可执行文件路径 (如果已在 PATH 中可直接填 yt-dlp)")
+
+  initData.config.ExtraCookieDir = "/mydocuments"
+  initData.config_desc.Set("ExtraCookieDir", "额外的 Cookie 搜索目录 (默认为文档目录)")
+
+  initData.config.AutoCookie = false
+  initData.config_desc.Set("AutoCookie", "是否自动扫描并启用 Cookie (默认关闭，开启后会自动扫描目录并根据结果勾选)")
+
   var cmd = initData.addCommand()
   cmd.name = "YtDlpDownload"
   cmd.method = "OnYtDlpDownload"
@@ -28,12 +39,21 @@ function OnInit(initData) {
  * @param {DOpusScriptCommandData} cmdData 
  */
 function OnYtDlpDownload(cmdData) {
-  var appPath = 'yt-dlp'
+  var appPath = Script.config.YtDlpPath
   var cmd = cmdData.func.command
   var dirPath = cmdData.func.sourceTab.path
+  var extraCookieDir = Script.config.ExtraCookieDir
+  var autoCookie = Script.config.AutoCookie
 
   // 1. 扫描 Cookie 文件
-  var cookieFiles = FindAllCookieFiles(dirPath)
+  // 如果开启了自动扫描，或者用户手动勾选了使用Cookie(在对话框后处理)，则需要扫描
+  // 这里先根据配置决定是否预扫描
+  var cookieFiles = []
+  var scanned = false
+  if (autoCookie) {
+    cookieFiles = FindAllCookieFiles(dirPath, extraCookieDir)
+    scanned = true
+  }
   var hasCookieFile = cookieFiles.length > 0
 
   var dlg = DOpus.dlg()
@@ -50,13 +70,18 @@ function OnYtDlpDownload(cmdData) {
 
   // 添加 Cookie 选项
   var cookieLabel = "使用 cookies"
-  if (hasCookieFile) {
-    cookieLabel += " (已找到 " + cookieFiles.length + " 个文件, 将自动匹配)"
+  if (autoCookie) {
+    if (hasCookieFile) {
+      cookieLabel += " (已找到 " + cookieFiles.length + " 个文件, 将自动匹配)"
+    } else {
+      cookieLabel += " (未找到 cookies.txt)"
+    }
   } else {
-    cookieLabel += " (未找到 cookies.txt)"
+    cookieLabel += " (勾选后将扫描目录)"
   }
+
   dlg.options[0].label = cookieLabel
-  dlg.options[0].state = hasCookieFile // 如果文件存在则默认勾选
+  dlg.options[0].state = hasCookieFile // 如果自动扫描且找到文件，则默认勾选；否则不勾选
 
   var ret = dlg.show()
   if (ret == 0) {
@@ -74,6 +99,13 @@ function OnYtDlpDownload(cmdData) {
   var useCookie = dlg.options[0].state
   var cookieArgs = ""
   if (useCookie) {
+    // 如果之前没有扫描（因为AutoCookie=false），现在需要扫描
+    if (!scanned) {
+      cookieFiles = FindAllCookieFiles(dirPath, extraCookieDir)
+      hasCookieFile = cookieFiles.length > 0
+      scanned = true
+    }
+
     if (hasCookieFile) {
       var bestCookie = GetBestCookieFile(url, cookieFiles)
       if (bestCookie) {
@@ -187,10 +219,11 @@ function OnYtDlpDownload(cmdData) {
 /**
  * 扫描所有可能的 Cookie 文件
  * 1. 当前工作目录 (传入参数)
- * 2. 文档目录
+ * 2. 额外配置目录 (如文档目录)
  * @param {DOpusPath} currentDir 当前工作目录
+ * @param {string} extraDir 额外扫描目录
  */
-function FindAllCookieFiles(currentDir) {
+function FindAllCookieFiles(currentDir, extraDir) {
   var files = []
   var fsUtil = DOpus.FSUtil
 
@@ -212,21 +245,23 @@ function FindAllCookieFiles(currentDir) {
     DOpus.output("扫描当前目录失败: " + e.message)
   }
 
-  // 2. 扫描文档目录
-  try {
-    var docPath = fsUtil.Resolve("/mydocuments")
-    DOpus.output("文档目录: " + docPath)
+  // 2. 扫描额外目录
+  if (extraDir) {
+    try {
+      var docPath = fsUtil.Resolve(extraDir)
+      DOpus.output("额外目录: " + docPath)
 
-    var folderEnum = fsUtil.ReadDir(docPath)
-    while (!folderEnum.complete) {
-      var item = folderEnum.next()
-      if (!item.is_dir && String(item.name).toLowerCase().indexOf("cookies.txt") >= 0) {
-        DOpus.output("  [文档目录] 找到: " + item.name)
-        files.push(String(item))
+      var folderEnum = fsUtil.ReadDir(docPath)
+      while (!folderEnum.complete) {
+        var item = folderEnum.next()
+        if (!item.is_dir && String(item.name).toLowerCase().indexOf("cookies.txt") >= 0) {
+          DOpus.output("  [额外目录] 找到: " + item.name)
+          files.push(String(item))
+        }
       }
+    } catch (e) {
+      DOpus.output("扫描额外目录失败: " + e.message)
     }
-  } catch (e) {
-    DOpus.output("扫描文档目录失败: " + e.message)
   }
 
   DOpus.output("扫描完成，共找到 " + files.length + " 个 Cookie 文件")
